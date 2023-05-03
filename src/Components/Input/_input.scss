@@ -1,0 +1,126 @@
+@import '../../Assets/Style/variables';
+
+.input {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  height: fit-content;
+  margin-bottom: 10px;
+  label {
+    padding-bottom: 5px;
+    cursor: pointer;
+    width: fit-content;
+    font-size: 14px;
+    color: #445774;
+  }
+  .input-field {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    .set_input_icon {
+      position: absolute;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+      transform: translateY(-50%);
+      top: 50%;
+      left: 15px;
+    }
+    .set_end_input_icon {
+      position: absolute;
+      cursor: pointer;
+      padding: 0;
+      margin: 0;
+      transform: translateY(-50%);
+      top: 50%;
+      right: 15px;
+    }
+
+    input,
+    input[type='text'] {
+      outline: none;
+      border-radius: 8px;
+      padding-left: 19px;
+      height: 40px;
+      color: #151516 !important;
+      border: 1px solid #dfe4ec;
+      &:focus {
+        border: 1px solid grey;
+      }
+      &::placeholder {
+        color: #b2bfd2;
+      }
+    }
+    input[type='search']::-webkit-search-cancel-button {
+      padding-right: 10px;
+    }
+    .errorInput {
+      border: 1px solid red !important;
+      &:focus {
+        border: 1px solid red;
+      }
+    }
+  }
+
+  .errorMessage {
+    font-size: 12px;
+    height: 20px;
+    padding-top: 5px;
+    width: fit-content;
+    color: red;
+    margin-bottom: 0;
+  }
+}
+
+.input .input-field,
+.select-containerundefined {
+  .form-label,
+  label {
+    padding-bottom: 5px;
+    cursor: pointer;
+    width: fit-content;
+    font-size: 14px;
+    color: #445774;
+  }
+  input {
+    outline: none;
+    border-radius: 8px;
+    height: 40px;
+    padding: 6px 2px;
+    padding-left: 15px;
+    border: 1px solid #dfe4ec;
+    &:focus {
+      border: 1px solid #2684ff;
+      &:hover {
+        border: 1px solid #2684ff;
+      }
+    }
+    &:hover {
+      border: 1px solid #818384;
+    }
+    &::placeholder {
+      color: #b2bfd2;
+    }
+  }
+  .errorMessage {
+    // padding-bottom: 5px;
+    font-size: 12px;
+    height: 20px;
+    padding-top: 4px;
+    width: fit-content;
+    font-size: 15px;
+    color: red;
+    margin-bottom: 0;
+  }
+}
+
+.css-b62m3t-container {
+  .css-319lph-ValueContainer {
+    padding-left: 19px;
+    padding-right: 0;
+    .css-y7mbje-singleValue {
+      margin: 0;
+    }
+  }
+}

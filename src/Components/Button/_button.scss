@@ -1,0 +1,28 @@
+.primary {
+  height: 48px;
+}
+.btn-border {
+  border-radius: 8px !important;
+}
+
+.fontWeight {
+  font-weight: 500;
+  font-size: 14px !important;
+}
+
+.main-btn {
+  transition: 0.1s all ease-in;
+  &:focus {
+    outline: none !important;
+    box-shadow: 0 !important;
+    outline: 1px solid rgb(195, 195, 196) !important;
+    transform: translateY(-3px);
+  }
+}
+.active-btn {
+  transition: 0.1s all ease-in;
+  &:active {
+    transform: translateY(3px);
+    // background-color: #0486ff45;
+  }
+}

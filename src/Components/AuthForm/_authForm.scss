@@ -1,0 +1,37 @@
+@import '../../Assets/Style/variables';
+
+.authForm_section {
+  width: 100%;
+  z-index: 100;
+  position: relative;
+  .authForm {
+    width: 100%;
+    min-width: 300px;
+    max-width: 500px;
+    margin: 20px 0;
+    .authFormTitle {
+      margin-bottom: 50px;
+      align-items: center;
+      h6 {
+        text-align: center;
+        width: fit-content;
+        color: $base-color;
+      }
+    }
+  }
+}
+@media screen and (max-width: 1024px) {
+  .authForm_section {
+    width: 100%;
+    margin: 20px;
+    .authForm {
+      width: 80%;
+    }
+  }
+}
+
+.auth_design {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}

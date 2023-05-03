@@ -1,0 +1,14 @@
+.t {
+  &-enter {
+    opacity: 0;
+  }
+  &-enter-active {
+    opacity: 1;
+  }
+  &-leave {
+    opacity: 1;
+  }
+  &-leave-active {
+    opacity: 0;
+  }
+}

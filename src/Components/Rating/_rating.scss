@@ -1,0 +1,18 @@
+.rating-container {
+  label {
+    padding-bottom: 5px;
+    cursor: pointer;
+    width: fit-content;
+    font-size: 14px;
+    color: #445774;
+  }
+}
+
+.star-rating {
+  display: flex;
+  .filled-star,
+  .star {
+    margin-right: 10px;
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,127 @@
+@import '../../Assets/Style/variables';
+.calendar-input {
+  position: relative;
+  input {
+    line-height: 36px;
+    padding-left: 20px;
+    @include flex(center, null, row-reverse);
+    width: 100%;
+    font-weight: 400;
+    color: #151516;
+    border: 1px solid $border-color;
+    border-radius: 8px;
+    min-height: 40px;
+    display: block;
+    height: 30px;
+    background: transparent;
+    z-index: 11;
+    color: #151516 !important;
+    border: 1px solid #dfe4ec;
+    &:focus {
+      border: 1px solid #2684ff;
+      outline: 0;
+      &:hover {
+        border: 1px solid #2684ff;
+      }
+    }
+    &:hover {
+      border: 1px solid #818384;
+    }
+    &::placeholder {
+      color: #b2bfd2;
+    }
+    &::datetime-edit {
+      text-transform: uppercase;
+    }
+    &::-webkit-datetime-edit {
+      text-transform: uppercase;
+    }
+
+    &[type='date']::-moz-calendar-picker-indicator {
+      cursor: pointer !important;
+      margin-left: -15px;
+
+      background: url('../../Assets/Icons/calendar.svg');
+      padding-top: 0px;
+      background-repeat: no-repeat;
+      width: 20px;
+      height: 20px;
+      z-index: 100 !important;
+    }
+
+    &[type='date']::-webkit-calendar-picker-indicator {
+      cursor: pointer !important;
+      margin-left: -15px;
+
+      background: url('../../Assets/Icons/calendar.svg');
+      padding-top: 0px;
+      background-repeat: no-repeat;
+      width: 20px;
+      height: 20px;
+      z-index: 100 !important;
+    }
+    &[type='datetime-local']::-webkit-calendar-picker-indicator {
+      cursor: pointer !important;
+      margin-left: -15px;
+      background: url('../../Assets/Icons/calendar.svg');
+      padding-top: 0px;
+      background-repeat: no-repeat;
+      width: 20px;
+      height: 20px;
+      z-index: 100 !important;
+    }
+  }
+}
+.errorInput {
+  border-radius: 8px;
+  border: 1px solid red;
+  &:focus {
+    border: 1px solid red;
+  }
+}
+
+.errorMessage {
+  height: 20px;
+  width: fit-content;
+  font-size: 15px;
+  color: red;
+  margin-bottom: 0;
+}
+
+.showPlaceholder {
+  input {
+    // position: relative;
+    &::before {
+      content: 'DD/MM/YYYY';
+      position: absolute;
+      top: 50%;
+      left: 25px;
+      transform: translate(-0%, -45%);
+      z-index: 10000;
+      height: 100%;
+      width: 100%;
+    }
+
+    &::-webkit-datetime-edit {
+      opacity: 0;
+      position: relative;
+      z-index: 10;
+
+      // &::-webkit-datetime-edit-fields-wrapper {
+      //   opacity: 0;
+      // }
+    }
+  }
+}
+
+.date-cancel-btn {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  font-size: 8px;
+  transform: translateY(-15%);
+  z-index: 10000;
+  overflow: hidden;
+  height: 100%;
+  width: 25px;
+}

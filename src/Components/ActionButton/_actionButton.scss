@@ -1,0 +1,45 @@
+@import '../../Assets/Style/variables';
+
+.actionButton {
+  width: fit-content;
+  height: 30px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px;
+  span {
+    font-size: 14px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 22px;
+  }
+}
+.share {
+  color: #5f6bf8;
+  background: rgba(95, 107, 248, 0.1);
+  border: 1px solid rgba(95, 107, 248, 0.25);
+  border-radius: 4px;
+}
+
+.edit {
+  color: #27b98d;
+  background: rgba(23, 195, 115, 0.1);
+  border: 1px solid rgba(23, 195, 115, 0.25);
+  border-radius: 4px;
+}
+
+.delete {
+  color: #ff5658;
+  background: rgba(255, 86, 88, 0.1);
+  border: 1px solid rgba(255, 86, 88, 0.25);
+  border-radius: 4px;
+}
+
+.create_resume {
+  color: $blue-500;
+  background: rgba(177, 218, 255, 0.2);
+  border: 1px dashed $blue-500;
+  border-radius: 8px;
+  height: 38px;
+}

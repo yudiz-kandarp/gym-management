@@ -1,0 +1,37 @@
+.card_container {
+  width: 336px;
+  height: 212px;
+  background: #ffffff;
+  border: 1px solid #f2f4f7;
+  border-radius: 8px;
+  .card_header {
+    .card_image {
+      border-radius: 8px;
+      background: #f9fafb;
+      overflow: hidden;
+      img {
+        width: 64px;
+        height: 64px;
+      }
+    }
+    .card_label {
+      height: fit-content;
+      font-weight: 500;
+      font-size: 12px;
+      line-height: 18px;
+    }
+  }
+  .card_footer {
+    .card_title {
+      font-size: 18px;
+      line-height: 28px;
+      color: #1c2430;
+    }
+    .card_subtitle {
+      color: #b2bfd2;
+      font-size: 14px;
+      line-height: 22px;
+    }
+  }
+}
+

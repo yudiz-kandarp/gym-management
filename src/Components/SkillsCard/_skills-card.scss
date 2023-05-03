@@ -1,0 +1,53 @@
+@import '../../Assets/Style/_variables';
+
+.skills-card {
+  margin-bottom: 24px;
+  .card {
+    min-height: 212px;
+    background: $white;
+    border: 1px solid $secondary-color;
+    border-radius: 8px;
+    padding: 24px;
+    .card-body {
+      padding: 0;
+      &.skills-card-head {
+        @include flex(flex-start, space-between, null);
+        margin-bottom: 24px;
+        .skills-img {
+          @include flex(center, center, null);
+          width: 64px;
+          height: 64px;
+          background: $base-color100;
+          border-radius: 8px;
+          overflow: hidden;
+          img {
+            object-fit: cover;
+            width: 100%;
+            height: 100%;
+          }
+        }
+      }
+      .card-title {
+        color: $black100;
+        font-weight: 600;
+        font-size: 16px;
+        // line-height: 18px;
+        margin-bottom: 8px;
+      }
+      .card-text {
+        color: $base-color;
+        font-weight: 500;
+        font-size: 14px;
+        // line-height: 22px;
+      }
+    }
+  }
+  @media (min-width: 1366px) and (max-width: 1920px) {
+    .card {
+      padding: 24px;
+    }
+  }
+  @media (max-width: 1280px) {
+    margin-bottom: 12px;
+  }
+}

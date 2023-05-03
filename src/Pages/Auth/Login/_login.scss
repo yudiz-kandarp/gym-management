@@ -1,0 +1,30 @@
+@import '../../../Assets/Style/variables';
+.login_option {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .rememberMe {
+    accent-color: $blue-500;
+    display: flex;
+    align-items: center;
+    input {
+      width: 15px;
+      height: 15px;
+      margin-right: 5px;
+      cursor: pointer;
+    }
+    label {
+      cursor: pointer;
+    }
+  }
+  .forgot_password {
+    Link {
+      color: $primary;
+    }
+  }
+}
+.errorResponse {
+  color: red;
+  margin-top: 10px;
+}

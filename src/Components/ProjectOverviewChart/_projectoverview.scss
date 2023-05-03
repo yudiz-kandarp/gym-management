@@ -1,0 +1,69 @@
+@import 'Assets/Style/_variables';
+
+.project-overview-chart {
+  width: 430px;
+  height: 380px;
+  margin-bottom: 10px;
+}
+.project-status-overview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 2px 14px;
+  background-color: $primary;
+  border-radius: 0 10px 10px 0px;
+  color: $secondary;
+  font-size: 12px;
+  font-weight: 500;
+  overflow: hidden;
+}
+
+@media (max-width: 576px) {
+  .project-overview-chart {
+    width: 430px;
+    height: 380px;
+    margin-bottom: 10px;
+  }
+}
+@media (min-width: 992px) and (max-width: 1165px) {
+  .project-overview-chart {
+    width: 300px;
+    height: 380px;
+    margin-bottom: 10px;
+  }
+}
+
+.project-overview-placeholder {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #ffffff74;
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 700;
+  span {
+    color: $blue-900;
+    text-align: center;
+    width: 200px;
+  }
+}
+.project-overview-details {
+  bottom: -10px;
+}
+
+.go-to-details {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 4px 8px;
+  background-color: $primary;
+  border-radius: 0 10px;
+  color: $secondary;
+  cursor: pointer;
+
+  font-size: 12px;
+  overflow: hidden;
+}

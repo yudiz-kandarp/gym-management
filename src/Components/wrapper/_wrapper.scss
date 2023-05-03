@@ -1,0 +1,27 @@
+.wrapper_section {
+  background-color: white;
+  position: relative;
+  height: auto;
+  padding: 20px;
+  margin: 20px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 10px 20px rgba(178, 191, 210, 0.344);
+  // position: relative;
+}
+.transparent {
+  padding: 20px 0;
+  background-color: transparent;
+  margin: 0px 20px;
+  box-shadow: 0px 0px 0px rgba(255, 255, 255, 0);
+  // position: relative;
+}
+
+.wrapper-loader {
+  position: absolute;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.608);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  cursor: progress;
+}

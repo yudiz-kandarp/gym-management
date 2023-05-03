@@ -1,0 +1,22 @@
+* {
+  margin: 0px;
+  // padding: 0px;
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+body {
+  background-color: white;
+  margin: 0;
+
+  *::-webkit-scrollbar {
+    width: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: #579aff;
+    border-radius: 10px;
+    transition: 0.4s all ease-in-out !important;
+    &:hover {
+      background-color: #0062f5;
+    }
+  }
+}

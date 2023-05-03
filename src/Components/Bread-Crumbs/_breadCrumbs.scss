@@ -1,0 +1,9 @@
+.breadcrumb {
+  .breadcrumb-item {
+    text-transform: capitalize;
+    &.active {
+      color: black;
+      font-weight: 500;
+    }
+  }
+}

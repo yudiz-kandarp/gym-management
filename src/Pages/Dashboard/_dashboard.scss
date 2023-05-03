@@ -1,0 +1,127 @@
+@import '../../Assets/Style/_variables';
+.dashboard {
+  &_card {
+    margin: 0;
+  }
+  .pageTitle-head {
+    border-bottom: none;
+  }
+  table {
+    margin-top: 16px;
+    margin-bottom: 0;
+    width: 100%;
+    display: table;
+    overflow-x: scroll;
+    white-space: nowrap;
+    border-collapse: collapse;
+    border-radius: 15px;
+
+    &:not(caption) > * > * {
+      vertical-align: middle;
+    }
+    thead {
+      width: 100%;
+      background-color: #f9fafb;
+      th {
+        padding: 15px 24px;
+        color: $heading-color;
+        font-size: 12px;
+        font-weight: 500;
+      }
+    }
+    tfoot {
+      width: 100%;
+      background-color: #f9fafb;
+      th {
+        padding: 15px 24px;
+        color: $heading-color;
+        font-size: 12px;
+        font-weight: 500;
+      }
+    }
+
+    tbody {
+      width: 100%;
+      border-top: 1px solid $secondary !important;
+      td {
+        padding: 16px 24px;
+        color: $input-color;
+        font-size: 14px;
+        font-weight: 400;
+      }
+      .size-sm {
+        align-items: center;
+        padding: 5px 20px;
+        color: $input-color;
+        font-size: 14px;
+        font-weight: 400;
+      }
+      .project-table-td {
+        @include flex(center, null, null);
+        .img-box {
+          width: 56px;
+          height: 56px;
+          background: $base-color100;
+          border-radius: 8px;
+          @include flex(center, center, null);
+        }
+        span {
+          margin-left: 16px;
+          font-size: 16px;
+          font-weight: 500;
+          color: $input-color;
+        }
+      }
+    }
+  }
+  .project-table {
+    th {
+      text-align: center;
+      &:nth-child(2) {
+        text-align: left;
+      }
+      &:nth-child(1),
+      &:nth-child(1) {
+        width: 50px;
+      }
+    }
+  }
+  @media (max-width: 680px) {
+    table {
+      thead th,
+      tbody td {
+        padding: 12px 10px;
+      }
+    }
+
+    .project-table {
+      tbody {
+        .pending,
+        .light-ola,
+        .light-green,
+        .light-yellow,
+        .light-blue50 {
+          width: 98px;
+        }
+        .project-table-td {
+          width: 170px;
+          .img-box {
+            width: 45px;
+            height: 45px;
+            img {
+              width: 50%;
+            }
+          }
+        }
+      }
+    }
+  }
+  @media (max-width: 991px) {
+    &:first-child .wrapper_section.transparent {
+      padding-bottom: 0;
+    }
+    .chart {
+      margin-top: 20px !important;
+    }
+  }
+}

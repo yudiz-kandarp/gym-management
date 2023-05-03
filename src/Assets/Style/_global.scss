@@ -1,0 +1,291 @@
+%btn {
+  padding: 2px 8px;
+  width: fit-content;
+  height: 22px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 12px;
+  border: none;
+  &:not(:last-child) {
+    margin-right: 10px;
+  }
+}
+
+.project-tabs {
+  padding: 0 10px;
+  .nav-item {
+    white-space: nowrap;
+    display: flex;
+    flex: 0 0 25%;
+    align-items: flex-end;
+    align-items: flex-end;
+    border-bottom: 2px solid transparent;
+    .nav-link {
+      color: $heading-color;
+      font-weight: 600;
+      border: none;
+      margin-bottom: -2px;
+      border-bottom: 2px solid transparent;
+      text-transform: capitalize;
+      width: 100%;
+      height: max-content;
+      text-align: left;
+      button {
+        background-color: $base-color;
+        color: $white;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+        border: none;
+        font-weight: 500;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      &.filled {
+        border-bottom: 2px solid #0ea085;
+        color: #0ea085;
+        background-color: transparent;
+        button {
+          background-color: #0ea085;
+        }
+        p {
+          color: #0ea085;
+        }
+      }
+      &.active {
+        border-bottom: 2px solid $primary;
+        color: $primary;
+        background-color: transparent;
+        button {
+          background-color: $primary;
+        }
+        p {
+          color: $primary;
+        }
+      }
+    }
+
+    &.tab-item {
+      @include flex(center, center, null);
+    }
+  }
+
+  .tab-content {
+    padding: 0 20px;
+  }
+  @media screen and (max-width: 1280px) {
+    .tab-item {
+      display: inherit !important;
+      button {
+        float: left;
+      }
+    }
+  }
+}
+
+.checkbox {
+  input {
+    height: 16px;
+    width: 16px;
+    padding: 0;
+    margin-right: 8px;
+    color: $black100;
+    &[type='radio'] {
+      // accent-color: $blue-500;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      border-radius: 50%;
+      &:checked {
+        background: $blue-500;
+        &:hover {
+          border: 3px solid #fff;
+        }
+      }
+
+      border: 3px solid #fff;
+
+      box-shadow: 0 0 0 2.5px $blue-500;
+    }
+  }
+  label {
+    padding: 0;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 24px;
+  }
+}
+.light-blue50 {
+  @extend %btn;
+  background: $blue50;
+  color: $primary;
+  // &:focus,&:hover {background: $blue50;color: $primary;}
+}
+.light-blue {
+  @extend %btn;
+  background: $blue100;
+  color: $blue-color;
+}
+.light-yellow {
+  @extend %btn;
+  background: $yellow100;
+  color: $yellow-color;
+}
+.light-red {
+  @extend %btn;
+  background: $red100;
+  color: $red-color;
+}
+.light-green {
+  @extend %btn;
+  background: $green100;
+  color: $green-color;
+}
+.light-ola {
+  @extend %btn;
+  background: $ola100;
+  color: $ola-color;
+}
+.light-gray {
+  @extend %btn;
+  background: $secondary-color;
+  color: $yellow-color;
+}
+.blue {
+  @extend %btn;
+  background-color: $blue50;
+  color: $blue-500;
+}
+.btn-blue {
+  background-color: $primary;
+  color: $white;
+  width: fix-content;
+  text-align: left;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  padding: 10px 20px;
+  &:hover {
+    color: $white;
+  }
+  &:focus {
+    box-shadow: 0 0 5px $primary;
+  }
+}
+.pending {
+  @extend %btn;
+  background-color: $secondary;
+  color: $heading-color;
+}
+.pageTitle-head {
+  padding-bottom: 10px;
+  border-bottom: 1px solid $secondary-color;
+}
+
+.all-dropdownButton {
+  .btn {
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    border: 1px solid $secondary-color;
+    background-color: $white;
+    padding: 8px 16px;
+    color: $heading-color;
+    &:focus {
+      box-shadow: none !important;
+    }
+    &.dropdown-toggle {
+      background-color: $white;
+    }
+  }
+}
+.dropdown-menu {
+  border: none;
+  box-shadow: 0px 0px 10px rgba(178, 191, 210, 0.694);
+  border-radius: 8px;
+  margin-top: 8px;
+  border-radius: 8px;
+  .dropdown-item {
+    transition: all 0.2s ease;
+    font-weight: 500;
+    svg {
+      margin-right: 10px;
+    }
+  }
+  .dropdown-item:hover,
+  .dropdown-item:active {
+    background-color: $blue-500;
+    color: $white !important;
+    svg {
+      filter: brightness(0) invert(1);
+    }
+    a {
+      color: $white !important;
+      svg {
+        filter: brightness(0) invert(1);
+      }
+    }
+  }
+}
+
+.button-tag {
+  @include flex(center, null, null);
+  flex-wrap: wrap;
+}
+
+%interview-status {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.interviewing {
+  color: #f29b20;
+  @extend %interview-status;
+}
+.selected {
+  color: #0ea085;
+  @extend %interview-status;
+}
+.not-selected {
+  color: #ac7ab4;
+  @extend %interview-status;
+}
+.profile-shared {
+  color: #2780ba;
+  @extend %interview-status;
+}
+
+.tooltip {
+  line-break: strict;
+  // word-wrap: ;
+}
+.bs-tooltip-end {
+  overflow: hidden;
+  background-color: #0ea085;
+  &::-webkit-scrollbar-track {
+    width: 0;
+  }
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  .form-check-input {
+    accent-color: $blue-500;
+    transition: all 1s ease-in;
+    &:checked {
+      accent-color: $blue-500;
+      transition: all 1s ease-in;
+    }
+    cursor: pointer;
+    height: 18px !important;
+    width: 18px !important;
+  }
+
+  .form-check-label {
+    padding: 0 6px;
+    cursor: pointer;
+  }
+}

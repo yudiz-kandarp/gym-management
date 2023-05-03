@@ -1,0 +1,51 @@
+$black: #000000;
+$black50: #0c1014;
+$black100: #1c2430;
+$text-color: #495159;
+$base-color: #b2bfd2;
+$base-color100: #f7f9fd;
+$primary: #369fff;
+$secondary-color: #f2f4f7;
+$blue-500: #0487ff;
+$heading-color: #7189ac;
+$input-color: #445774;
+$border-color: #dfe4ec;
+$white: #ffffff;
+$red100: #fce6e4;
+$ola100: #f3ebf4;
+$blue100: #e6f2fa;
+$blue50: #ebf5ff;
+$green100: #e3fdf8;
+$yellow100: #fdf2e2;
+$ola-color: #ac7ab4;
+$red-color: #e64c3b;
+$blue-color: #2780ba;
+$green-color: #0ea085;
+$yellow-color: #f29b20;
+$btn-focus-box-shadow: inset 0px 0px 0px 10px transparent;
+$btn-transition: transform 0.1s ease-out, color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+  box-shadow 0.15s ease-in-out;
+
+$primary: #369fff;
+$blue-100: #b1daff;
+$blue-200: #8cc8ff;
+$blue-300: #57afff;
+$blue-400: #369fff;
+$blue-600: #047be8;
+$blue-700: #0360b5;
+$blue-800: #024a8c;
+$blue-900: #02396b;
+$secondary: #f2f4f7;
+
+// @include flex(center, center, null);
+
+@mixin flex($items, $justify, $direction) {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  align-items: $items;
+  justify-content: $justify;
+  flex-direction: $direction;
+}
