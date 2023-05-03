@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
-import { deleteEmployee } from 'Query/Employee/employee.mutation'
+import { deleteSubscription } from 'Query/Subscription/subscription.mutation'
 import { getSubscriptionList } from 'Query/Subscription/subscription.query'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
@@ -42,7 +42,7 @@ function SubscriptionList() {
     staleTime: 240000,
   })
 
-  const mutation = useMutation(deleteEmployee, {
+  const mutation = useMutation(deleteSubscription, {
     onSuccess: (res) => {
       queryClient.invalidateQueries('subscription')
       toaster(res.data.message)

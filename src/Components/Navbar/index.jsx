@@ -3,7 +3,7 @@ import { useMutation, useQuery } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import { Dropdown, Offcanvas } from 'react-bootstrap'
 import { logoutApi } from 'Query/Auth/auth.query'
-import { getMyProfile } from 'Query/My-Profile/myprofile.query'
+// import { getMyProfile } from 'Query/My-Profile/myprofile.query'
 import Sidebar from 'Components/Sidebar'
 import { ReactComponent as Logout } from 'Assets/Icons/Logout.svg'
 import { ReactComponent as Hamburger } from 'Assets/Icons/Hamburger.svg'
@@ -44,7 +44,7 @@ export default function Navigationbar() {
     )
   })
 
-  const { data, isLoading } = useQuery('myProfile', getMyProfile, { enabled: false, select: (data) => data?.data.user })
+  const { data, isLoading } = useQuery('myProfile', () => {}, { enabled: false, select: (data) => data?.data.user })
 
   return (
     <>

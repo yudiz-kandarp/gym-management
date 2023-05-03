@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
-import { deleteEmployee } from 'Query/Employee/employee.mutation'
+import { deleteTrainer } from 'Query/Trainer/trainer.mutation'
 import { getTrainerList } from 'Query/Trainer/trainer.query'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
@@ -42,7 +42,7 @@ function TrainerList() {
     staleTime: 240000,
   })
 
-  const mutation = useMutation(deleteEmployee, {
+  const mutation = useMutation(deleteTrainer, {
     onSuccess: (res) => {
       queryClient.invalidateQueries('trainer')
       toaster(res.data.message)
