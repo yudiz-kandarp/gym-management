@@ -6,8 +6,6 @@ import { Row, Col } from 'react-bootstrap'
 import Input from 'Components/Input'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
-// import Select from 'Components/Select'
-import { Loading } from 'Components'
 import Rating from 'Components/Rating'
 import { toaster } from 'helpers'
 import { route } from 'Routes/route'
@@ -59,7 +57,7 @@ function AddTrainer() {
     }
   }
 
-  useQuery(['trainersDetails', id], () => getSpecificTrainer(id), {
+  const { isLoading } = useQuery(['trainersDetails', id], () => getSpecificTrainer(id), {
     enabled: isEdit || isViewOnly,
     select: (data) => data?.data?.trainer,
     onSuccess: (data) => {
@@ -69,11 +67,8 @@ function AddTrainer() {
     },
   })
 
-  if (mutation.isLoading || updateMutation.isLoading) {
-    return <Loading />
-  }
   return (
-    <Wrapper>
+    <Wrapper isLoading={isLoading || mutation.isLoading || updateMutation.isLoading}>
       <PageTitle
         title="Trainer Details"
         cancelText="Cancel"

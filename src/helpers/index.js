@@ -155,7 +155,7 @@ export function navigationTo(link) {
 }
 
 export function cell(data, optionalText = '-') {
-  return data || optionalText
+  return data ?? optionalText
 }
 
 export function handleErrors(errors, errorSetter) {

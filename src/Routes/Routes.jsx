@@ -15,6 +15,8 @@ const TrainersList = lazy(() => import('Pages/Trainer'))
 const SubscriptionList = lazy(() => import('Pages/Subscription'))
 const AddTrainer = lazy(() => import('Pages/Trainer/Add-Trainer'))
 const AddSubscription = lazy(() => import('Pages/Subscription/Add-Subscription'))
+const AddTransaction = lazy(() => import('Pages/Transaction/Add-Transaction'))
+const TransactionsList = lazy(() => import('Pages/Transaction'))
 
 const RoutesDetails = [
   {
@@ -40,8 +42,9 @@ const RoutesDetails = [
       { path: route.subscriptions, Component: SubscriptionList, allowed: 'noRole', exact: true },
       { path: route.subscriptionsAddViewEdit(':type'), Component: AddSubscription, allowed: 'noRole', exact: true },
       { path: route.subscriptionsAddViewEdit(':type', ':id'), Component: AddSubscription, allowed: 'noRole', exact: true },
-      { path: route.transactions, Component: Dashboard, allowed: 'noRole', exact: true },
-      { path: route.transactionsAddViewEdit(':type', ':id'), Component: Dashboard, allowed: 'noRole', exact: true },
+      { path: route.transactions, Component: TransactionsList, allowed: 'noRole', exact: true },
+      { path: route.transactionsAddViewEdit(':type'), Component: AddTransaction, allowed: 'noRole', exact: true },
+      { path: route.transactionsAddViewEdit(':type', ':id'), Component: AddTransaction, allowed: 'noRole', exact: true },
     ],
   },
 ]

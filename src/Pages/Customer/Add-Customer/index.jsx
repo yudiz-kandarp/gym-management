@@ -6,8 +6,6 @@ import { Row, Col } from 'react-bootstrap'
 import Input from 'Components/Input'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
-// import Select from 'Components/Select'
-import { Loading } from 'Components'
 import { toaster } from 'helpers'
 import './_addCustomer.scss'
 import { route } from 'Routes/route'
@@ -53,7 +51,7 @@ function AddCustomer() {
     }
   }
 
-  useQuery(['customersDetails', id], () => getSpecificCustomer(id), {
+  const { isLoading } = useQuery(['customersDetails', id], () => getSpecificCustomer(id), {
     enabled: isEdit || isViewOnly,
     select: (data) => data?.data?.customer,
     onSuccess: (data) => {
@@ -62,11 +60,8 @@ function AddCustomer() {
     },
   })
 
-  if (mutation.isLoading || updateMutation.isLoading) {
-    return <Loading />
-  }
   return (
-    <Wrapper>
+    <Wrapper isLoading={isLoading || mutation.isLoading || updateMutation.isLoading}>
       <div className="pageTitle-head">
         <PageTitle
           title="Customer Details"

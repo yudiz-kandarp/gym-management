@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
-import { deleteSubscription } from 'Query/Subscription/subscription.mutation'
-import { getSubscriptionList } from 'Query/Subscription/subscription.query'
+import { deleteTransaction } from 'Query/Transaction/transaction.mutation'
+import { getTransactionList } from 'Query/Transaction/transaction.query'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
 import TablePagination from 'Components/Table-pagination'
@@ -19,7 +19,7 @@ import { ReactComponent as SearchIcon } from 'Assets/Icons/search.svg'
 import { appendParams, cell, formatDate, getSortedColumns, isGranted, parseParams, toaster } from 'helpers'
 import { route } from 'Routes/route'
 
-function SubscriptionList() {
+function TransactionList() {
   const queryClient = useQueryClient()
   const parsedData = parseParams(location.search)
   const [modal, setModal] = useState({ open: false })
@@ -37,14 +37,14 @@ function SubscriptionList() {
   }
   const [requestParams, setRequestParams] = useState(getParams())
 
-  const { isLoading, isFetching, data } = useQuery(['subscription', requestParams], () => getSubscriptionList(requestParams), {
+  const { isLoading, isFetching, data } = useQuery(['transaction', requestParams], () => getTransactionList(requestParams), {
     select: (data) => data.data.data,
     staleTime: 240000,
   })
 
-  const mutation = useMutation(deleteSubscription, {
+  const mutation = useMutation(deleteTransaction, {
     onSuccess: (res) => {
-      queryClient.invalidateQueries('subscription')
+      queryClient.invalidateQueries('transaction')
       toaster(res.data.message)
       setModal({ open: false })
     },
@@ -56,8 +56,8 @@ function SubscriptionList() {
         { name: '#', connectionName: 'id', isSorting: false, sort: 0 },
         { name: 'Customer Name', connectionName: 'sCustomerName', isSorting: false, sort: 0 },
         { name: 'Payment Tag', connectionName: 'ePaymentTag', isSorting: false, sort: 0 },
-        { name: 'Start Date', connectionName: 'dStartDate', isSorting: false, sort: 0 },
-        { name: 'End Date', connectionName: 'dEndDate', isSorting: false, sort: 0 },
+        { name: 'Transaction Date', connectionName: 'dTransactionDate', isSorting: false, sort: 0 },
+        { name: 'Amount', connectionName: 'nPrice', isSorting: false, sort: 0 },
       ],
       parsedData
     )
@@ -66,15 +66,15 @@ function SubscriptionList() {
   const navigate = useNavigate()
 
   function gotoAdd() {
-    navigate(route.subscriptionsAddViewEdit('add'))
+    navigate(route.transactionsAddViewEdit('add'))
   }
 
   function gotoEdit(id) {
-    navigate(route.subscriptionsAddViewEdit('edit', id))
+    navigate(route.transactionsAddViewEdit('edit', id))
   }
 
   function gotoDetail(id) {
-    navigate(route.subscriptionsAddViewEdit('view', id))
+    navigate(route.transactionsAddViewEdit('view', id))
   }
 
   function onDelete(id) {
@@ -143,8 +143,8 @@ function SubscriptionList() {
     <>
       <Wrapper>
         <PageTitle
-          title="Subscriptions"
-          BtnText={isGranted(permissions.CREATE) ? 'Add Subscription' : null}
+          title="Transactions"
+          BtnText={isGranted(permissions.CREATE) ? 'Add Transaction' : null}
           handleButtonEvent={gotoAdd}
           add
         />
@@ -153,7 +153,7 @@ function SubscriptionList() {
             <Search
               startIcon={<SearchIcon className="mb-1" />}
               style={{ width: '250px', height: '40px' }}
-              placeholder="Search Subscriptions"
+              placeholder="Search Transactions"
               value={search}
               onChange={handleSearch}
             />
@@ -164,19 +164,19 @@ function SubscriptionList() {
         <DataTable
           columns={columns}
           align="left"
-          totalData={data?.subscribedUsers?.length}
+          totalData={data?.transactions?.length}
           isLoading={isLoading || mutation.isLoading || isFetching}
           handleSorting={handleSorting}
           disableActions={!isGranted(permissions.ALL)}
         >
-          {data?.subscribedUsers?.map((item, i) => {
+          {data?.transactions?.map((item, i) => {
             return (
               <tr key={i}>
                 <td>{cell(requestParams.page + (i + 1))}</td>
                 <td>{cell(item?.oCustomer?.sName)}</td>
                 <td>{cell(item?.ePaymentTag)}</td>
-                <td>{cell(formatDate(item?.dStartDate))}</td>
-                <td>{cell(formatDate(item?.dEndDate))}</td>
+                <td>{cell(formatDate(item?.dTransactionDate))}</td>
+                <td>{cell(item?.nPrice)}</td>
                 <ActionColumn
                   permissions={permissions}
                   handleView={() => gotoDetail(item._id)}
@@ -215,4 +215,4 @@ function SubscriptionList() {
   )
 }
 
-export default SubscriptionList
+export default TransactionList

@@ -11,20 +11,17 @@ import { ReactComponent as Down } from 'Assets/Icons/Down.svg'
 import Logo from 'Assets/Images/RAW-logo.png'
 // import { ReactComponent as NotificationLogo } from 'Assets/Icons/Notification.svg'
 import { handleAlterImage, removeToken } from 'helpers'
+import { getProfile } from 'Query/Profile/profile.query'
 
 export default function Navigationbar() {
   const navigate = useNavigate()
-  const { mutate } = useMutation('logout', () => logoutApi(), {
-    retry: false,
-    onSuccess: () => {
-      const isLocalStorage = !!localStorage.getItem('token')
-      removeToken(isLocalStorage)
-      navigate('/login')
-    },
-  })
+  const { mutate } = useMutation('logout', () => logoutApi(), { retry: false })
 
   function handleLogout() {
     mutate()
+    const isLocalStorage = !!localStorage.getItem('token')
+    removeToken(isLocalStorage)
+    navigate('/login')
   }
 
   const [sidebarview, setSidebarView] = useState(false)
@@ -44,7 +41,7 @@ export default function Navigationbar() {
     )
   })
 
-  const { data, isLoading } = useQuery('myProfile', () => {}, { enabled: false, select: (data) => data?.data.user })
+  const { data, isLoading } = useQuery('myProfile', getProfile, { select: (data) => data?.data.data })
 
   return (
     <>
@@ -72,12 +69,9 @@ export default function Navigationbar() {
                 <Dropdown.Toggle as={CustomToggle} id="dropdown-basic">
                   <div className="d-flex align-items-center">
                     <div className="profile_picture">
-                      <img
-                        onError={handleAlterImage}
-                        src={data?.sProfilePic ? 'https://jr-web-developer.s3.ap-south-1.amazonaws.com/' + data?.sProfilePic : ''}
-                      />
+                      <img onError={handleAlterImage} src={data?.sLogo} />
                     </div>
-                    <div className="user-name ">{data?.sName}</div>
+                    <div className="user-name ">{data?.sUserName}</div>
                     <div className="down-arrow">
                       <Down className="mx-3" />
                     </div>
