@@ -17,13 +17,15 @@ import { useNavigate } from 'react-router-dom'
 function AddInquiry () {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
-  const { control, handleSubmit } = useForm()
+  const { control, handleSubmit, reset } = useForm()
+  console.log('control >> ', control)
 
   const { isEdit, isViewOnly, id } = usePageType()
   console.log('id :>> ', id)
 
   const mutation = useMutation((data) => addInquiry(data), {
     onSuccess: (res) => {
+      console.log('res >> ', res)
       queryClient.invalidateQueries('inquiry')
       toaster(res.data.message)
       navigate(route.inquiry)
@@ -38,7 +40,8 @@ function AddInquiry () {
   })
 
   const onSubmit = (data) => {
-    data.eStatus = data.eStatus.value
+    console.log('data >> ', data)
+    // data.eStatus = data.eStatus.value
     if (isEdit) {
       updateMutation.mutate({ id, data })
     } else {
@@ -49,13 +52,14 @@ function AddInquiry () {
   const { isLoading } = useQuery(['inquiryDetails', id], () => getSpecificInquiry(id), {
     enabled: isEdit || isViewOnly,
     select: (data) => data.data.inquiry,
-    // onSuccess: (data) => {
-    //   data.eGender = Gender?.find((g) => g.value === data?.eGender)
-    //   reset(data)
-    // },
+    onSuccess: (data) => {
+      // data.eStatus = Gender?.find((g) => g.value === data?.eGender)
+      reset(data)
+      console.log('success data >> ', data)
+    },
   })
 
- 
+
   return (
     <>
       <Wrapper isLoading={isLoading || mutation.isLoading || updateMutation.isLoading}>
@@ -75,7 +79,15 @@ function AddInquiry () {
               control={control}
               rules={{ required: 'This field is required' }}
               render={({ field, fieldState: { error } }) => (
-                <Input {...field} labelText="Customer Name" placeholder="Enter Customer Name" id="sName" disabled={isViewOnly} errorMessage={error?.message} />
+                <Input
+                  {...field}
+                  labelText="Customer Name"
+                  placeholder="Enter Customer Name"
+                  id="sName"
+                  disabled={isViewOnly}
+                  errorMessage={error?.message}
+                  type="text"
+                />
               )}
             />
           </Col>
@@ -122,6 +134,7 @@ function AddInquiry () {
               rules={{ required: 'Inquiry Date is required' }}
               render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
                 <CalendarInput
+                  id="dInquiryAt"
                   disabled={isViewOnly}
                   onChange={onChange}
                   value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
@@ -133,49 +146,6 @@ function AddInquiry () {
             />
           </Col>
         </Row>
-        {/* <Row className="mt-2 mt-lg-2 pt-lg-2">
-          <Col lg={6} md={6} xs={12}>
-            <Row>
-              <Col lg={12} md={12} xs={12}>
-                <Controller
-                  name="sMobile"
-                  control={control}
-                  rules={{ required: 'This field is required' }}
-                  render={({ field, fieldState: { error } }) => (
-                    <Input
-                      {...field}
-                      labelText="Contact Number"
-                      type="number"
-                      placeholder="Enter Contact Number"
-                      id="sMobile"
-                      disabled={isViewOnly}
-                      errorMessage={error?.message}
-                    />
-                  )}
-                />
-              </Col>
-            </Row>
-          </Col>
-          <Col lg={6} md={6} xs={12}>
-            <Controller
-              name="sAddress"
-              control={control}
-              rules={{ required: 'This field is required' }}
-              render={({ field, fieldState: { error } }) => (
-                <>
-                  <DescriptionInput
-                    className="p-2 text-dark"
-                    label="Address"
-                    errorMessage={error?.message}
-                    disabled={isViewOnly}
-                    placeholder="Enter Address"
-                    {...field}
-                  />
-                </>
-              )}
-            />
-          </Col>
-        </Row> */}
       </Wrapper>
     </>
   )

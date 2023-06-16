@@ -26,9 +26,10 @@ function AddCustomer() {
   ]
 
   const mutation = useMutation((data) => addCustomer(data), {
-    onSuccess: (res) => {
+    onSuccess: (data) => {
+      console.log('customerres >> ', data)
       queryClient.invalidateQueries('customers')
-      toaster(res.data.message)
+      toaster(data.data.message)
       navigate(route.customers)
     },
   })
@@ -78,7 +79,10 @@ function AddCustomer() {
             control={control}
             rules={{ required: 'This field is required' }}
             render={({ field, fieldState: { error } }) => (
-              <Input {...field} labelText="Name" placeholder="Enter Name" id="sName" disabled={isViewOnly} errorMessage={error?.message} />
+              <>
+                {console.log('Customer field >> ', field)}
+                <Input {...field} labelText="Name" placeholder="Enter Name" id="sName" disabled={isViewOnly} errorMessage={error?.message} />
+              </>
             )}
           />
         </Col>
