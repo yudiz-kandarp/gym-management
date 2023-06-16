@@ -16,3 +16,7 @@ export function getMonthlyProjects(year = new Date().getFullYear()) {
 export function getProjectDashboard(query) {
   return Axios.get(`/api/indicator/project/v1?${addQueryParams(query)}`)
 }
+
+export function getDashboardStatistics() {
+  return Axios.get(`/v1/dashboard/statistics`)
+}

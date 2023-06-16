@@ -9,6 +9,8 @@ export const route = {
   subscriptionsAddViewEdit: dynamicRoutes('subscriptions'),
   transactions: '/transactions',
   transactionsAddViewEdit: dynamicRoutes('transactions'),
+  inquiry: '/inquiry',
+  inquiryAddViewEdit: dynamicRoutes('inquiry'),
 }
 function dynamicRoutes(module = '') {
   function commonRoutes({ id, type }) {

@@ -164,12 +164,12 @@ function SubscriptionList() {
         <DataTable
           columns={columns}
           align="left"
-          totalData={data?.subscribedUsers?.length}
+          totalData={data?.aSubscriptionList?.length}
           isLoading={isLoading || mutation.isLoading || isFetching}
           handleSorting={handleSorting}
           disableActions={!isGranted(permissions.ALL)}
         >
-          {data?.subscribedUsers?.map((item, i) => {
+          {data?.aSubscriptionList?.map((item, i) => {
             return (
               <tr key={i}>
                 <td>{cell(requestParams.page + (i + 1))}</td>

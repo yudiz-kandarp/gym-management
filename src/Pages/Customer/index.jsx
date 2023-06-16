@@ -200,12 +200,12 @@ const CustomersList = () => {
         <DataTable
           columns={columns}
           align="left"
-          totalData={data?.customers?.length}
+          totalData={data?.aCustomerList?.length}
           isLoading={isLoading || mutation.isLoading || isFetching}
           handleSorting={handleSorting}
           disableActions={!isGranted(permissions.ALL)}
         >
-          {data?.customers?.map((item, i) => {
+          {data?.aCustomerList?.map((item, i) => {
             return (
               <tr key={i}>
                 <td>{cell(requestParams.page + (i + 1))}</td>

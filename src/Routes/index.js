@@ -9,7 +9,7 @@ function AllRoutes() {
   function allPaths(children, isPrivateRoute) {
     return children?.map(({ path, Component, exact, props, allowed, children: child }, i) =>
       child?.length ? (
-        <Route element={<Component />}>{allPaths(child, isPrivateRoute)}</Route>
+        <Route key={i} element={<Component />}>{allPaths(child, isPrivateRoute)}</Route>
       ) : isGranted(allowed) || !isPrivateRoute ? (
         <Route
           key={i}

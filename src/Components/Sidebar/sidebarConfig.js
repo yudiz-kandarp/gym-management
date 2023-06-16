@@ -5,6 +5,7 @@ import EmployeeManagement from 'Assets/Icons/EmployeeManagement'
 import Transactions from 'Assets/Icons/Transactions'
 import Trainers from 'Assets/Icons/Trainers'
 import Subscriptions from 'Assets/Icons/Subscription'
+import infoIcon from 'Assets/Icons/infoIcon'
 
 export const sidebarConfig = [
   { Component: Dashboard, title: 'Dashboard', link: route.dashboard, color: '#884B9D', allowed: 'noRole' },
@@ -12,5 +13,6 @@ export const sidebarConfig = [
   { Component: Trainers, title: 'Trainers', link: route.trainers, color: '#0EA085', allowed: 'noRole' },
   { Component: Subscriptions, title: 'Subscriptions', link: route.subscriptions, color: '#F29B20', allowed: 'noRole' },
   { Component: Transactions, title: 'Transactions', link: route.transactions, color: '#2780BA', allowed: 'noRole' },
+  { Component: infoIcon, title: 'Inquiry', link: route.inquiry, color: '#2780BA', allowed: 'noRole' },
 ]
 

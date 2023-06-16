@@ -17,6 +17,8 @@ const AddTrainer = lazy(() => import('Pages/Trainer/Add-Trainer'))
 const AddSubscription = lazy(() => import('Pages/Subscription/Add-Subscription'))
 const AddTransaction = lazy(() => import('Pages/Transaction/Add-Transaction'))
 const TransactionsList = lazy(() => import('Pages/Transaction'))
+const InquiryList = lazy(() => import('Pages/Inquiry'))
+const AddInquiry = lazy(() => import('Pages/Inquiry/Add-Inquiry'))
 
 const RoutesDetails = [
   {
@@ -45,6 +47,10 @@ const RoutesDetails = [
       { path: route.transactions, Component: TransactionsList, allowed: 'noRole', exact: true },
       { path: route.transactionsAddViewEdit(':type'), Component: AddTransaction, allowed: 'noRole', exact: true },
       { path: route.transactionsAddViewEdit(':type', ':id'), Component: AddTransaction, allowed: 'noRole', exact: true },
+
+      { path: route.inquiry, Component: InquiryList, allowed: 'noRole', exact: true },
+      { path: route.inquiryAddViewEdit(':type'), Component: AddInquiry, allowed: 'noRole', exact: true },
+      { path: route.inquiryAddViewEdit(':type', ':id'), Component: AddInquiry, allowed: 'noRole', exact: true },
     ],
   },
 ]
