@@ -33,10 +33,15 @@ function AddSubscription() {
   })
   const { isEdit, isViewOnly, id } = usePageType()
 
+  // const ePaymentTag = [
+  //   { label: 'Partially', value: 'Partially' },
+  //   { label: 'Full', value: 'Full' },
+  //   { label: 'Pending', value: 'Pending' },
+  // ]
   const ePaymentTag = [
-    { label: 'Partially', value: 'Partially' },
-    { label: 'Full', value: 'Full' },
-    { label: 'Pending', value: 'Pending' },
+    { label: 'Partially', value: 'P' },
+    { label: 'Full', value: 'F' },
+    { label: 'Pending', value: 'P' },
   ]
 
   const mutation = useMutation((data) => addSubscription(data), {

@@ -3,7 +3,7 @@ import Search from 'Components/Search'
 import Wrapper from 'Components/wrapper'
 import { debounce } from 'Hooks/debounce'
 import { deleteInquiry } from 'Query/Inquiry/inquiry.mutation'
-import { getInquiryFollowUpList, getInquiryList, getInquiryVisitList } from 'Query/Inquiry/inquiry.query'
+import { getInquiryList } from 'Query/Inquiry/inquiry.query'
 import { appendParams, cell, formatDate, getSortedColumns, isGranted, parseParams, toaster } from 'helpers'
 import React, { useCallback, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
@@ -16,7 +16,6 @@ import TablePagination from 'Components/Table-pagination'
 import Button from 'Components/Button'
 import CustomModal from 'Components/Modal'
 import { route } from 'Routes/route'
-import { Col, Row } from 'react-bootstrap'
 
 function InquiryList () {
   const queryClient = useQueryClient()
@@ -25,7 +24,7 @@ function InquiryList () {
 
   const [search, setSearch] = useState(parsedData?.search)
 
-  function getParams() {
+  function getParams () {
     return {
       page: Number(parsedData?.page) * Number(parsedData?.limit) || 0,
       limit: Number(parsedData?.limit) || 10,
@@ -37,17 +36,6 @@ function InquiryList () {
   const [requestParams, setRequestParams] = useState(getParams())
 
   const { isLoading, isFetching, data } = useQuery(['inquiry', requestParams], () => getInquiryList(requestParams), {
-    select: (data) => data.data.data,
-    staleTime: 240000,
-  })
-
-  const { data: visit } = useQuery(['inquiryVisit'], () => getInquiryVisitList, {
-    select: (data) => data.data,
-    staleTime: 240000,
-  })
-  console.log('Visit data >> ', visit)
-
-  const { data: followUp } = useQuery(['inquiryFollowup'], () => getInquiryFollowUpList(), {
     select: (data) => data.data.data,
     staleTime: 240000,
   })
@@ -73,37 +61,22 @@ function InquiryList () {
     )
   )
 
-  const [followUpColumns, setFollowUpColumns] = useState(
-    getSortedColumns(
-      [
-        { name: '#', connectionName: 'id', isSorting: false, sort: 0 },
-        { name: 'FollowedUp By', connectionName: 'sFollowedUpBy', isSorting: false, sort: 0 },
-        { name: 'Response', connectionName: 'sResponse', isSorting: false, sort: 0 },
-        { name: 'Created Date', connectionName: 'dCreatedDate', isSorting: false, sort: 0 },
-        { name: 'FollowedUp At', connectionName: 'dFollowupAt', isSorting: false, sort: 0 },
-      ],
-      // parsedData
-    )
-  )
-  console.log('setColumns >> ', setFollowUpColumns)
-
-
   const navigate = useNavigate()
 
-  function gotoAdd() {
+  function gotoAdd () {
     navigate(route.inquiryAddViewEdit('add'))
   }
 
-  function gotoEdit(id) {
+  function gotoEdit (id) {
     navigate(route.inquiryAddViewEdit('edit', id))
   }
 
-  function gotoDetail(id) {
+  function gotoDetail (id) {
     console.log('id :>> ', id)
     navigate(route.inquiryAddViewEdit('view', id))
   }
 
-  function onDelete(id) {
+  function onDelete (id) {
     setModal({ open: true, id })
   }
 
@@ -115,25 +88,25 @@ function InquiryList () {
     []
   )
 
-  function handleSearch(e) {
+  function handleSearch (e) {
     e.preventDefault()
     setSearch(e.target.value)
     const trimmed = e.target.value.trim()
     debouncedSearch(trimmed)
   }
 
-  function changePage(page) {
+  function changePage (page) {
     setRequestParams({ ...requestParams, page, limit: requestParams?.limit || 10 })
     appendParams({ ...requestParams, page: page / requestParams?.limit, limit: requestParams?.limit || 10 })
   }
 
-  function changePageSize(pageSize) {
+  function changePageSize (pageSize) {
     setRequestParams({ ...requestParams, page: 0, limit: pageSize })
     appendParams({ ...requestParams, page: 0, limit: pageSize })
     // setSelectedRows([{ changingPage: true }])
   }
 
-  function handleSorting(name) {
+  function handleSorting (name) {
     let selectedFilter
     const filter = columns.map((data) => {
       if (data.connectionName === name) {
@@ -161,13 +134,23 @@ function InquiryList () {
     UPDATE: 'noRole',
     DELETE: 'noRole',
     EXCEL: 'noRole',
-    get ALL() {
+    get ALL () {
       return [this.READ, this.UPDATE, this.DELETE]
     },
   }
 
   return (
     <>
+      <Wrapper transparent>
+        <TablePagination
+          currentPage={Number(requestParams?.page)}
+          totalCount={data?.count || 0}
+          pageSize={requestParams?.limit || 5}
+          onPageChange={(page) => changePage(page)}
+          onLimitChange={(limit) => changePageSize(limit)}
+        />
+      </Wrapper>
+      
       <Wrapper>
         <PageTitle
           title="Inquiry"
@@ -214,96 +197,6 @@ function InquiryList () {
             )
           })}
         </DataTable>
-      </Wrapper>
-
-      <div className='children'>
-        <Row>
-          <Col lg={6} md={6} xs={12}>
-            <Wrapper>
-              <div className="pageTitle-head">
-                <PageTitle
-                  title="Inquiry Visit"
-                  // cancelText="Cancel"
-                  // BtnText={!isViewOnly ? 'Save' : null}
-                  // handleButtonEvent={handleSubmit(onSubmit)}
-                  // cancelButtonEvent={() => navigate(route.inquiry)}
-                />
-              </div>
-              <DataTable
-                columns={columns}
-                align="left"
-                totalData={data?.aInquiryList?.length}
-                isLoading={isLoading || mutation.isLoading || isFetching}
-              >
-                {visit?.aInquiryFollowupList?.map((item, i) => {
-                  return (
-                    <tr key={i}>
-                      <td>{cell(requestParams.page + (i + 1))}</td>
-                      <td>{cell(item?.oFollowupBy.sName)}</td>
-                      <td>{cell(item?.sResponse)}</td>
-                      <td>{cell(formatDate(item?.dCreatedDate))}</td>
-                      <td>{cell(formatDate(item?.dFollowupAt))}</td>
-                      <ActionColumn
-                        permissions={permissions}
-                        handleView={() => gotoDetail(item._id)}
-                        handleEdit={() => gotoEdit(item._id)}
-                        handleDelete={() => onDelete(item._id)}
-                      />
-                    </tr>
-                  )
-                })}
-              </DataTable>
-            </Wrapper>
-          </Col>
-          <Col lg={6} md={6} xs={12}>
-            <Wrapper>
-              <div className="pageTitle-head">
-                <PageTitle
-                  title="Inquiry FollowUp"
-                  // cancelText="Cancel"
-                  // BtnText={!isViewOnly ? 'Save' : null}
-                  // handleButtonEvent={handleSubmit(onSubmit)}
-                  // cancelButtonEvent={() => navigate(route.inquiry)}
-                />
-              </div>
-              <DataTable
-                columns={followUpColumns}
-                align="left"
-                totalData={followUp?.aInquiryFollowupList?.length}
-                isLoading={isLoading || mutation.isLoading || isFetching}
-              >
-                {followUp?.aInquiryFollowupList?.map((item, i) => {
-                  return (
-                    <tr key={i}>
-                      <td>{cell(requestParams.page + (i + 1))}</td>
-                      <td>{cell(item?.oFollowupBy.sName)}</td>
-                      <td>{cell(item?.sResponse)}</td>
-                      <td>{cell(formatDate(item?.dCreatedDate))}</td>
-                      <td>{cell(formatDate(item?.dFollowupAt))}</td>
-                      <ActionColumn
-                        permissions={permissions}
-                        handleView={() => gotoDetail(item._id)}
-                        handleEdit={() => gotoEdit(item._id)}
-                        handleDelete={() => onDelete(item._id)}
-                      />
-                    </tr>
-                  )
-                })}
-              </DataTable>
-            </Wrapper>
-          </Col>
-        </Row>
-
-      </div>
-
-      <Wrapper transparent>
-        <TablePagination
-          currentPage={Number(requestParams?.page)}
-          totalCount={data?.count || 0}
-          pageSize={requestParams?.limit || 5}
-          onPageChange={(page) => changePage(page)}
-          onLimitChange={(limit) => changePageSize(limit)}
-        />
       </Wrapper>
 
       <CustomModal modalBodyClassName="p-0 py-2" open={modal.open} handleClose={() => setModal({ open: false })} title="Are you Sure?">

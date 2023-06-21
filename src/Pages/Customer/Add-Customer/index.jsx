@@ -44,6 +44,7 @@ function AddCustomer() {
   const { control, reset, handleSubmit } = useForm()
 
   const onSubmit = (data) => {
+    console.log('data >> ', data)
     data.eGender = data.eGender.value
     if (isEdit) {
       updateMutation.mutate({ id, data })

@@ -9,8 +9,9 @@ export function getSpecificInquiry(id) {
 }
 
 // inquiry Visit queries
-export function getInquiryVisitList() {
-  return Axios.get(`/v1/inquiryVisit/list/all?id=6486ddd535c15c191dd10bb9`)
+export function getInquiryVisitList(id) {
+  console.log('visit id >> ', id)
+  return Axios.get(`/v1/inquiryVisit/list/all?id=${id}`)
 }
 
 // inquiry FollowUp queries
