@@ -6,7 +6,7 @@ import { Row, Col } from 'react-bootstrap'
 import Input from 'Components/Input'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
-import { toaster } from 'helpers'
+import { formatDate, toaster } from 'helpers'
 import './_addCustomer.scss'
 import { route } from 'Routes/route'
 import DescriptionInput from 'Components/DescriptionInput'
@@ -14,6 +14,7 @@ import Select from 'Components/Select'
 import usePageType from 'Hooks/usePageType'
 import { addCustomer, updateCustomer } from 'Query/Customer/customer.mutation'
 import { getSpecificCustomer } from 'Query/Customer/customer.query'
+import CalendarInput from 'Components/Calendar-Input'
 
 function AddCustomer() {
   const navigate = useNavigate()
@@ -58,6 +59,8 @@ function AddCustomer() {
     select: (data) => data?.data?.customer,
     onSuccess: (data) => {
       data.eGender = Gender?.find((g) => g.value === data?.eGender)
+      data.dBirthDate = formatDate(data.dBirthDate, '-', true)
+      data.dAnniversaryDate = formatDate(data.dAnniversaryDate, '-', true)
       reset(data)
     },
   })
@@ -184,6 +187,43 @@ function AddCustomer() {
                   {...field}
                 />
               </>
+            )}
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col>
+        <Controller
+            name="dBirthDate"
+            control={control}
+            rules={{ required: 'Date of Birth is required' }}
+            render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
+              <CalendarInput
+                disabled={isViewOnly}
+                onChange={onChange}
+                value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
+                ref={ref}
+                errorMessage={error?.message}
+                title="Date Of Birth"
+              />
+            )}
+          />
+        </Col>
+        <Col>
+        <Controller
+            name="dAnniversaryDate"
+            control={control}
+            rules={{ required: 'Anniversary Date is required' }}
+            render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
+              <CalendarInput
+                disabled={isViewOnly}
+                onChange={onChange}
+                value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
+                ref={ref}
+                errorMessage={error?.message}
+                title="Anniversary Date"
+              />
             )}
           />
         </Col>

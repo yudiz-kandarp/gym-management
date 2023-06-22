@@ -17,3 +17,8 @@ export function deleteInquiry(id) {
 export async function addInquiryVisit(data) {
   return Axios.put('/v1/inquiryVisit/add', data)
 }
+
+export async function updateInquiryVisit(data) {
+  console.log('edit data >> ', data)
+  return Axios.patch(`/v1/inquiryVisit/edit/${data?.id}`, data.data)
+}

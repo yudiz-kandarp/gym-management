@@ -78,6 +78,7 @@ export function encryption(sPassword) {
 }
 
 export const addQueryParams = (value) => {
+  console.log('value :>> ', value)
   const data = { ...value }
   Object.keys(data).forEach((e) => (data[e] === '' || typeof data[e] === 'object' || !data[e]?.toString().length) && delete data[e])
   return new URLSearchParams(data)?.toString()

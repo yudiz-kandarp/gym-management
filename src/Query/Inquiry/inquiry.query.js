@@ -15,6 +15,6 @@ export function getInquiryVisitList(id) {
 }
 
 // inquiry FollowUp queries
-export function getInquiryFollowUpList(query) {
-  return Axios.get(`/v1/inquiryFollowup/list/all?${addQueryParams(query)}`)
+export function getInquiryFollowUpList(id) {
+  return Axios.get(`/v1/inquiryFollowup/list/all?${id}`)
 }
