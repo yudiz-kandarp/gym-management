@@ -42,7 +42,7 @@ function InquiryList () {
 
   const mutation = useMutation(deleteInquiry, {
     onSuccess: (res) => {
-      queryClient.invalidateQueries('transaction')
+      queryClient.invalidateQueries('inquiry')
       toaster(res.data.message)
       setModal({ open: false })
     },
@@ -60,6 +60,7 @@ function InquiryList () {
       parsedData
     )
   )
+  console.log('data >> ', data)
 
   const navigate = useNavigate()
 

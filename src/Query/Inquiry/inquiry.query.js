@@ -14,6 +14,11 @@ export function getInquiryVisitList(id) {
   return Axios.get(`/v1/inquiryVisit/list/all?id=${id}`)
 }
 
+export function getSpecificInquiryVisit(id) {
+  console.log('specific id >> ', id)
+  return Axios.get(`/v1/inquiryVisit/${id}`)
+}
+
 // inquiry FollowUp queries
 export function getInquiryFollowUpList(id) {
   return Axios.get(`/v1/inquiryFollowup/list/all?${id}`)

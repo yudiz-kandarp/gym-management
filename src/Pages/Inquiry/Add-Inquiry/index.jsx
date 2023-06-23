@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import ActionColumn from 'Components/ActionColumn'
 import CalendarInput from 'Components/Calendar-Input'
 import DataTable from 'Components/DataTable'
@@ -7,31 +8,37 @@ import CustomModal from 'Components/Modal'
 import PageTitle from 'Components/Page-Title'
 import Wrapper from 'Components/wrapper'
 import usePageType from 'Hooks/usePageType'
-import { addInquiry, addInquiryVisit, updateInquiry, updateInquiryVisit } from 'Query/Inquiry/inquiry.mutation'
-import { getInquiryFollowUpList, getInquiryVisitList, getSpecificInquiry } from 'Query/Inquiry/inquiry.query'
+import { addInquiry, addInquiryVisit, deleteInquiryVisit, updateInquiry, updateInquiryVisit } from 'Query/Inquiry/inquiry.mutation'
+import { getInquiryFollowUpList, getInquiryVisitList, getSpecificInquiry, getSpecificInquiryVisit } from 'Query/Inquiry/inquiry.query'
 import { route } from 'Routes/route'
-import { cell, formatDate, getSortedColumns, isGranted, parseParams, toaster } from 'helpers'
+import { appendParams, cell, formatDate, getSortedColumns, isGranted, parseParams, toaster } from 'helpers'
 import React, { useEffect, useState } from 'react'
 import { Col, Row } from 'react-bootstrap'
 import { Controller, useForm } from 'react-hook-form'
 import { useMutation, useQuery, useQueryClient } from 'react-query'
 import { useNavigate } from 'react-router-dom'
 import Button from 'Components/Button'
+import TablePagination from 'Components/Table-pagination'
 
 function AddInquiry () {
   const queryClient = useQueryClient()
   const navigate = useNavigate()
 
   const { control, handleSubmit, reset } = useForm()
-  const { control: visitControl, reset: resetVisit } = useForm()
+  const { control: visitControl, handleSubmit: handleVisitSubmit, reset: resetVisit } = useForm()
   const { control: followUpControl, reset: resetFollowUp } = useForm()
-  
-  // console.log('control >> ', control)
-  console.log('visitControl >> ', visitControl)
-  console.log('followUpControl >> ', followUpControl)
+  console.log('visitControl :>> ', visitControl)
+
+  const [followupData, setFollowupData] = useState([])
+  const [visitData, setVisitData] = useState([])
+  const [action, setAction] = useState('')
+
+  const [inquiryVisitId, setInquiryVisitId] = useState(null)
+
   const [modal, setModal] = useState({ open: false })
   const [isVisit, setIsVisit] = useState(false)
-  const [followUpId, setFollowUpId] = useState('')
+  const [deleteId, setDeleteId] = useState('')
+  const [inquiryId, setInquiryId] = useState('')
 
   const parsedData = parseParams(location.search)
   function getParams () {
@@ -43,10 +50,14 @@ function AddInquiry () {
       order: parsedData.order || '',
     }
   }
-  const [requestParams] = useState(getParams())
+  const [requestParams, setRequestParams] = useState(getParams())
 
   const { isEdit, isViewOnly, id } = usePageType()
-  console.log('isEdit :>> ', isEdit, ', isViewOnly :>> ', isViewOnly)
+  { console.log(id, 'id 54') }
+  useEffect(() => {
+    setInquiryId(id)
+  }, [id])
+  // console.log('inquiryId :>> ', inquiryId)
 
   const { mutate: mutateAddInquiry, isLoading: isAddingInquiry } = useMutation((data) => addInquiry(data), {
     onSuccess: (res) => {
@@ -56,6 +67,7 @@ function AddInquiry () {
       navigate(route.inquiry)
     },
   })
+
   const updateMutation = useMutation((data) => updateInquiry(data), {
     onSuccess: (res) => {
       queryClient.invalidateQueries('inquiry')
@@ -64,12 +76,13 @@ function AddInquiry () {
     },
   })
 
+
   const onSubmit = (data) => {
-    // data.eStatus = data.eStatus.value
+    console.log('object :>> ', data)
     if (isEdit) {
       updateMutation.mutate({ id, data })
     } else {
-      mutateAddInquiry.mutate(data)
+      mutateAddInquiry(data)
     }
   }
 
@@ -86,11 +99,13 @@ function AddInquiry () {
   // inquiry Visit
   const { data: visit } = useQuery(['inquiryVisit', id], () => getInquiryVisitList(id), {
     enabled: isEdit || isViewOnly || isVisit,
-    select: (data) => data.data.data,
+    select: (data) => data.data.data.aInquiryVisitList,
     staleTime: 240000,
     onSuccess: (data) => {
-      data.dVistedAt = formatDate(data.dVistedAt, '-', true)
-      resetVisit(data)
+      // console.log('data >> ', data.map(item => item.dVisitedAt))
+      const oVisit = data.find(item => item.dVisitedAt)
+        console.log('visit data >> ', data)
+      setVisitData(data)
     },
   })
 
@@ -116,7 +131,7 @@ function AddInquiry () {
     },
   })
 
-  const { mutate: mutateUpdateVisit } = useMutation((data) => updateInquiryVisit(data), {
+  const { mutate: mutateUpdateVisit } = useMutation((id, data) => updateInquiryVisit(id, data), {
     onSuccess: (res) => {
       console.log('res >> ', res)
       queryClient.invalidateQueries('inquiryVisit')
@@ -125,43 +140,90 @@ function AddInquiry () {
     },
   })
 
-  const onVisitSubmit = (data) => {
-    if (isEdit) {
+  const onVisitSubmit = (onSubmitData) => {
+    const data = {
+      ...onSubmitData,
+      iInquiryID: id
+    }
+    if (action === 'edit') {
       mutateUpdateVisit({ id, data })
+      console.log('id >> ', id, data)
     } else {
-      mutateAddInquiryVisit(data)
+      mutateAddInquiryVisit({
+        ...onSubmitData,
+        iInquiryID: id
+      })
     }
     console.log('onSubmit data >> ', data)
-    setIsVisit(true)
+    // setIsVisit(true)
 
     setModal({ open: true, isVisit })
   }
 
-  function gotoAdd (e) {
-    // visitReset()
-    console.log('id >> ', e.target.innerText)
-    if (e.target.innerText === 'Add Visit') {
-      setIsVisit(true)
-    } else {
-      setIsVisit(false)
-    }
+  function gotoAdd (data) {
+    setAction('add')
+    onVisitSubmit(data)
+    console.log('data >> ', data.target.innerText)
+    resetVisit()
+    // setIsVisit(true)
+    // } else {
+    //   resetFollowUp()
+    //   setIsVisit(false)
+    // }
 
-    setModal({ open: true, isVisit })
+    setModal({ open: true, })
   }
 
   function gotoEdit (id, data) {
-    console.log('id >> ', id, data)
-    onVisitSubmit()
+    setAction('edit')
     setIsVisit(true)
+    console.log('id >> ', id, data)
+    onVisitSubmit(id)
+    setModal({id})
 
     setModal({ open: true, isVisit })
+
+    const filteredData = visitData?.find(item => item._id === id)
+    console.log('object :>> ', visitData)
+    resetVisit({
+      sPurpose: filteredData?.sPurpose,
+      dVisitedAt: cell(formatDate(filteredData?.dVisitedAt)),
+      sDescription: filteredData?.sDescription,
+    })
   }
 
   function gotoDetail (id) {
-    console.log('id :>> ', id)
-    setIsVisit(true)
+    console.log('id visit :>> ', id)
+    setAction('view')
+    setInquiryVisitId(id)
+    setIsVisit(true, id)
+    // getSpecificInquiryVisit(id)
+    // const filteredData = visitData?.find(item => item._id === id)
+    // console.log('filteredData :>> ', filteredData)
     setModal({ open: true, isVisit })
+
+    // resetVisit({
+    //   sPurpose: specificVisit?.sPurpose,
+    //   dVisitedAt: cell(formatDate(specificVisit?.dVisitedAt)),
+    //   sDescription: specificVisit?.sDescription,
+    // })
   }
+
+  const { data: specificVisit } = useQuery(['visitListDetail'], () => getSpecificInquiryVisit(inquiryVisitId), {
+    enabled: !!inquiryVisitId,
+    // select: (data) => data.data.data,
+
+    onSuccess: (data) => {
+      console.log('data >> ', data)
+
+      resetVisit(data)
+    },
+  })
+
+  console.log('specificVisit :>> ', specificVisit)
+
+  const oldData = queryClient.getQueryData(['visitListDetail'])
+  console.log('oldData >> ', oldData)
 
   // inquiry followUp
   const { data: followUp } = useQuery(['inquiryFollowup', id], () => getInquiryFollowUpList(id), {
@@ -170,7 +232,8 @@ function AddInquiry () {
     staleTime: 240000,
     onSuccess: (data) => {
       // data.dVistedAt = formatDate(data.dVistedAt, '-', true)
-      resetFollowUp(data)
+      // resetFollowUp(data)
+      setFollowupData(data.aInquiryFollowupList)
       console.log('data :>> ', data)
     },
   })
@@ -187,20 +250,49 @@ function AddInquiry () {
     )
   )
 
+  console.log('action >> ', action)
+
+  function gotoFollowUpAdd (data) {
+    resetFollowUp()
+    setAction('add')
+
+    console.log('data >> ', data.target.innerText)
+    setIsVisit(false)
+    // } else {
+    //   resetFollowUp()
+    //   setIsVisit(false)
+    // }
+
+    setModal({ open: true, isVisit })
+  }
+
   function gotoFollowUpEdit (id, data) {
+    setAction('edit')
     console.log('id >> ', id, data)
     // onVisitSubmit()
     setIsVisit(false)
 
     setModal({ open: true, isVisit })
-    // navigate(route.inquiryAddViewEdit('edit', id))
+
+    const filteredData = followupData?.find(item => item._id === id)
+    resetFollowUp({
+      sResponse: filteredData?.sResponse,
+      dFollowupAt: formatDate(filteredData?.dFollowupAt),
+      iFollowupBy: filteredData?.oFollowupBy?.sName,
+    })
   }
 
   function gotoFollowUpDetail (id) {
-    setFollowUpId(id)
-    console.log('id folowp :>> ', id )
+    setAction('view')
+    const filteredData = followupData?.find(item => item._id === id)
+
     setIsVisit(false)
     setModal({ open: true, isVisit })
+    resetFollowUp({
+      sResponse: filteredData?.sResponse,
+      dFollowupAt: formatDate(filteredData?.dFollowupAt),
+      iFollowupBy: filteredData?.oFollowupBy?.sName,
+    })
   }
 
   const permissions = {
@@ -214,30 +306,35 @@ function AddInquiry () {
     },
   }
 
-  function onDelete (id) {
+  function onDelete (id, inquiryId) {
     console.log('id >> ', id)
-    setModal({ open: true, id })
+    setAction('delete')
+    setDeleteId(id)
+    console.log({ id, inquiryId })
+    deleteMutation({ deletedId: id, inquiryId: inquiryId })
+    setModal({ open: true, isVisit, id, inquiryId })
+  }
+  // console.log('deleteId :>> ', deleteId, ', inquiryId :>> ', inquiryId)
+
+  function changePage (page) {
+    setRequestParams({ ...requestParams, page, limit: requestParams?.limit || 10 })
+    appendParams({ ...requestParams, page: page / requestParams?.limit, limit: requestParams?.limit || 10 })
   }
 
-  const followpdata = followUpControl?._formValues?.aInquiryFollowupList
+  function changePageSize (pageSize) {
+    setRequestParams({ ...requestParams, page: 0, limit: pageSize })
+    appendParams({ ...requestParams, page: 0, limit: pageSize })
+    // setSelectedRows([{ changingPage: true }])
+  }
 
-  useEffect(() => {
-    const filter = followpdata?.map((item, i) => {
-      if (item._id === followUpId) {
-        return (
-        <React.Fragment key={i}>
-          {console.log(item?.sResponse)}
-        </React.Fragment>
-        )
-      }
-    })
-    console.log('filter >> ', filter)
-  }, [])
-
-  console.log('id >> ', followUpId)
-  console.log('data', followpdata?.map((item) => item._id === followUpId))
-
-  console.log('aIn  ', followUpControl?._formValues?.aInquiryFollowupList)
+  // delete mutation
+  const { mutate: deleteMutation } = useMutation((deleteId, inquiryId) => deleteInquiryVisit(deleteId, inquiryId), {
+    onSuccess: (data) => {
+      toaster(data.data.message)
+      queryClient.invalidateQueries('inquiryVisit')
+      setModal({ open: false })
+    },
+  })
 
   return (
     <>
@@ -411,7 +508,7 @@ function AddInquiry () {
 
         {!isViewOnly ?
           <Row>
-            <Col lg={12} md={6} xs={12}>
+            <Col lg={12} md={12} xs={12}>
               <Controller
                 name="sAddress"
                 control={control}
@@ -517,7 +614,7 @@ function AddInquiry () {
         </Row>
         {!isViewOnly ?
           <Row>
-            <Col lg={12} md={6} xs={12} className="mt-md-0 mt-3">
+            <Col lg={12} md={12} xs={12} className="mt-md-0 mt-3">
               <Controller
                 name="sDescription"
                 control={control}
@@ -580,6 +677,16 @@ function AddInquiry () {
 
       </Wrapper>
 
+      <Wrapper transparent>
+        <TablePagination
+          currentPage={Number(requestParams?.page)}
+          totalCount={followUp?.length || 0}
+          pageSize={requestParams?.limit || 5}
+          onPageChange={(page) => changePage(page)}
+          onLimitChange={(limit) => changePageSize(limit)}
+        />
+      </Wrapper>
+
       <Wrapper>
         <div className="pageTitle-head">
           <PageTitle
@@ -595,23 +702,23 @@ function AddInquiry () {
           totalData={followUp?.aInquiryFollowupList?.length}
           isLoading={isLoading || mutateAddInquiry.isLoading}
         >
-          {visit?.aInquiryVisitList?.map((item, i) => {
+          {visitData?.map((item, i) => {
             // if (id === item?.iInquiryID) {
-              return (
-                <tr key={i}>
-                  <td>{cell(requestParams.page + (i + 1))}</td>
-                  <td>{cell(item?.oCreator.sUserName)}</td>
-                  <td>{cell(item?.sPurpose)}</td>
-                  <td>{cell(item?.sDescription)}</td>
-                  <td>{cell(formatDate(item?.dVistedAt))}</td>
-                  <ActionColumn
-                    permissions={permissions}
-                    handleView={() => gotoDetail(item._id)}
-                    handleEdit={() => gotoEdit(item._id)}
-                    handleDelete={() => onDelete(item._id)}
-                  />
-                </tr>
-              )
+            return (
+              <tr key={i}>
+                <td>{cell(requestParams.page + (i + 1))}</td>
+                <td>{cell(item?.oCreator.sUserName)}</td>
+                <td>{cell(item?.sPurpose)}</td>
+                <td>{cell(item?.sDescription)}</td>
+                <td>{cell(formatDate(item?.dVisitedAt))}</td>
+                <ActionColumn
+                  permissions={permissions}
+                  handleView={() => gotoDetail(item._id)}
+                  handleEdit={() => gotoEdit(item._id)}
+                  handleDelete={() => setModal({})}
+                />
+              </tr>
+            )
             // }
           })}
         </DataTable>
@@ -622,18 +729,18 @@ function AddInquiry () {
           <PageTitle
             title="Inquiry FollowUp"
             BtnText={isGranted(permissions.CREATE) ? 'Add FollowUp' : null}
-            handleButtonEvent={gotoAdd}
+            handleButtonEvent={gotoFollowUpAdd}
             add
           />
         </div>
+        {/* {console.log('followupData >> ', followupData)} */}
         <DataTable
           columns={followUpColumns}
           align="left"
           totalData={followUp?.aInquiryFollowupList?.length}
           isLoading={isLoading || mutateAddInquiry.isLoading}
         >
-          {/* {console.log('filter :>> ', followUp?.aInquiryFollowupList?.filter((item => id === item?.iInquiryID)))} */}
-          {followUp?.aInquiryFollowupList?.map((item, i) => {
+          {followupData?.map((item, i) => {
             if (id === item?.iInquiryID) {
               return (
                 <tr key={i}>
@@ -653,14 +760,14 @@ function AddInquiry () {
           })}
         </DataTable>
       </Wrapper>
-{console.log('isVisit >> ', isVisit)}
-      {isVisit ?
+      {console.log('isVisit >> ', isVisit)}
+      {isViewOnly && (action === 'add' || action === 'view' || action === 'edit') ?
         <>
           <CustomModal
             modalBodyClassName="p-0 py-2"
             open={modal.open}
             handleClose={() => setModal({ open: false })}
-            title={`Inquiry Visit Add`}
+            title={action === 'add' ? 'Add Inquiry Visit' : action === 'edit' ? 'Edit Inquiry Visit' : 'View Inquiry Visit'}
           // cancelText="Cancel"
           // BtnText={!isViewOnly ? 'Save' : null}
           // handleButtonEvent={handleSubmit(onVisitSubmit)}
@@ -672,35 +779,37 @@ function AddInquiry () {
                 <Row>
                   <Col lg={6} md={6} xs={12}>
                     <Controller
-                      name="aInquiryVisitList[0].sPurpose"
+                      name='sPurpose'
                       control={visitControl}
                       rules={{ required: 'This field is required' }}
                       render={({ field, fieldState: { error } }) => (
-                        <Input
-                          {...field}
-                          labelText="Purpose"
-                          placeholder="Enter Purpose"
-                          id="sPurpose"
-                          errorMessage={error?.message}
-                          disabled={isViewOnly}
-                          type='text'
-                        />
+                        <>
+                          <Input
+                            {...field}
+                            labelText="Purpose"
+                            placeholder="Enter Purpose"
+                            id="sPurpose"
+                            errorMessage={error?.message}
+                            disabled={action === 'view'}
+                            type='text'
+                          />
+                        </>
                       )}
                     />
                   </Col>
                   <Col lg={6} md={6} xs={12} className="mt-md-0 mt-3">
                     <Controller
-                      name="aInquiryVisitList[0].dVistedAt"
+                      name="dVisitedAt"
                       control={visitControl}
                       rules={{ required: 'Visit Date is required' }}
                       render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
                         <CalendarInput
-                          id="dVistedAt"
+                          id="dVisitedAt"
                           onChange={onChange}
                           value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
                           ref={ref}
                           errorMessage={error?.message}
-                          disabled={isViewOnly}
+                          disabled={action === 'view'}
                           title="Visited Date"
                         />
                       )}
@@ -708,9 +817,9 @@ function AddInquiry () {
                   </Col>
                 </Row>
                 <Row>
-                  <Col lg={12} md={6} xs={12} className="mt-md-0 mt-3">
+                  <Col lg={12} md={12} xs={12} className="mt-md-0 mt-3">
                     <Controller
-                      name="aInquiryVisitList[0].sDescription"
+                      name="sDescription"
                       control={visitControl}
                       rules={{ required: 'This field is required' }}
                       render={({ field, fieldState: { error } }) => (
@@ -719,7 +828,7 @@ function AddInquiry () {
                             className="p-2 text-dark"
                             label="Description"
                             errorMessage={error?.message}
-                            disabled={isViewOnly}
+                            disabled={action === 'view'}
                             placeholder="Enter Description"
                             {...field}
                           />
@@ -733,104 +842,129 @@ function AddInquiry () {
                 <Button className="bg-secondary bg-lighten-xl me-2 text-muted" onClick={() => setModal({ open: false })}>
                   Cancel
                 </Button>
-                <Button type='submit' onClick={gotoEdit}>
-                  Save
-                </Button>
+                {
+                  (action === 'add' || action === 'edit') &&
+                  <Button type='submit' onClick={handleVisitSubmit(action === 'add' ? gotoAdd : gotoEdit)}>
+                    Save
+                  </Button>
+                }
               </div>
             </div>
           </CustomModal>
         </> :
         <>
-          <CustomModal
-            modalBodyClassName="p-0 py-2"
-            open={modal.open}
-            handleClose={() => setModal({ open: false })}
-            title={`Inquiry FollowUp Add`}
-          // cancelText="Cancel"
-          // BtnText={!isViewOnly ? 'Save' : null}
-          // handleButtonEvent={handleSubmit(onVisitSubmit)}
-          // cancelButtonEvent={() => setModal({ open: false })}
-          >
-            {/* <h6>Are you sure you want to Add new Inquiry?</h6> */}
-            <div className="d-flex flex-column">
-              <div>
+          {
+            (action === 'add' || action === 'view' || action === 'edit') &&
+            <CustomModal
+              modalBodyClassName="p-0 py-2"
+              open={modal.open}
+              handleClose={() => setModal({ open: false })}
+              title={action === 'add' ? 'Add Inquiry FollowUp' : action === 'edit' ? 'Edit Inquiry FollowUp' : 'View Inquiry FollowUp'}
+            // cancelText="Cancel"
+            // BtnText={!isViewOnly ? 'Save' : null}
+            // handleButtonEvent={handleSubmit(onVisitSubmit)}
+            // cancelButtonEvent={() => setModal({ open: false })}
+            >
+              {/* <h6>Are you sure you want to Add new Inquiry?</h6> */}
+              <div className="d-flex flex-column">
+                <div>
 
-                <Row>
-                  <Col lg={6} md={6} xs={12}>
-                    
-                    <Controller
-                      name={`aInquiryFollowupList.map(item => if(item?._id === id) {
-                        item?.sResponse
-                      })`}
-                      control={visitControl}
-                      rules={{ required: 'This field is required' }}
-                      render={({ field, fieldState: { error } }) => (
-                        <Input
-                          {...field}
-                          labelText="Response"
-                          placeholder="Enter Response"
-                          id="sResponse"
-                          errorMessage={error?.message}
-                          disabled={isViewOnly}
-                          type='text'
-                        />
-                      )}
-                    />
-                  </Col>
-                  <Col lg={6} md={6} xs={12} className="mt-md-0 mt-3">
-                    <Controller
-                      name="dFollowupAt"
-                      control={visitControl}
-                      rules={{ required: 'FolowUp At Date is required' }}
-                      render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
-                        <CalendarInput
-                          id="dFollowupAt"
-                          onChange={onChange}
-                          value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
-                          ref={ref}
-                          errorMessage={error?.message}
-                          disabled={isViewOnly}
-                          title="FollowUp At"
-                        />
-                      )}
-                    />
-                  </Col>
-                </Row>
-                <Row>
-                  <Col lg={12} md={6} xs={12} className="mt-md-0 mt-3">
-                    <Controller
-                      name="iFollowupBy"
-                      control={visitControl}
-                      rules={{ required: 'This field is required' }}
-                      render={({ field, fieldState: { error } }) => (
-                        <Input
-                          {...field}
-                          labelText="FollowUp By"
-                          placeholder="Enter FollowUp By"
-                          id="iFollowupBy"
-                          errorMessage={error?.message}
-                          disabled={isViewOnly}
-                          type='text'
-                        />
-                      )}
-                    />
-                  </Col>
-                </Row>
+                  <Row>
+                    <Col lg={12} md={12} xs={12}>
+                      <Controller
+                        name={`sResponse`}
+                        control={followUpControl}
+                        rules={{ required: 'This field is required' }}
+                        render={({ field, fieldState: { error } }) => (
+                          <>
+                            {console.log('field >> ', field)}
+                            <Input
+                              {...field}
+                              labelText="Response"
+                              placeholder="Enter Response"
+                              id="sResponse"
+                              errorMessage={error?.message}
+                              disabled={action === 'view'}
+                              type='text'
+                            />
+                          </>
+                        )}
+                      />
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col lg={6} md={6} xs={12} className="mt-md-0 mt-3">
+                      <Controller
+                        name="iFollowupBy"
+                        control={followUpControl}
+                        rules={{ required: 'This field is required' }}
+                        render={({ field, fieldState: { error } }) => (
+                          <Input
+                            {...field}
+                            labelText="FollowUp By"
+                            placeholder="Enter FollowUp By"
+                            id="iFollowupBy"
+                            errorMessage={error?.message}
+                            disabled={action === 'view'}
+                            type='text'
+                          />
+                        )}
+                      />
+                    </Col>
+                    <Col lg={6} md={6} xs={12} className="mt-md-0 mt-3">
+                      <Controller
+                        name="dFollowupAt"
+                        control={followUpControl}
+                        rules={{ required: 'FolowUp At Date is required' }}
+                        render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
+                          <CalendarInput
+                            id="dFollowupAt"
+                            onChange={onChange}
+                            value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
+                            ref={ref}
+                            errorMessage={error?.message}
+                            disabled={action === 'view'}
+                            title="FollowUp At"
+                          />
+                        )}
+                      />
+                    </Col>
+                  </Row>
 
+                </div>
+                <div className="d-flex justify-content-end mt-4">
+                  <Button className="bg-secondary bg-lighten-xl me-2 text-muted" onClick={() => setModal({ open: false })}>
+                    Cancel
+                  </Button>
+                  {
+                    (action === 'add' || action === 'edit') &&
+                    <Button type='submit' onClick={gotoFollowUpEdit}>
+                      Save
+                    </Button>
+                  }
+                </div>
               </div>
-              <div className="d-flex justify-content-end mt-4">
-                <Button className="bg-secondary bg-lighten-xl me-2 text-muted" onClick={() => setModal({ open: false })}>
-                  Cancel
-                </Button>
-                <Button type='submit' onClick={gotoFollowUpEdit}>
-                  Save
-                </Button>
-              </div>
-            </div>
-          </CustomModal>
+            </CustomModal>
+          }
         </>
       }
-
+      {
+        action === 'delete' &&
+        <CustomModal modalBodyClassName="p-0 py-2" open={modal.open} handleClose={() => setModal({ open: false })} title="Are you Sure?">
+          <h6>Are you sure you want to delete?</h6>
+          <div className="d-flex justify-content-between">
+            <div></div>
+            <div className="mt-4">
+              <Button className="bg-secondary bg-lighten-xl me-2 text-muted" onClick={() => setModal({ open: false })}>
+                Cancel
+              </Button>
+              <Button>
+                Delete
+              </Button>
+            </div>
+          </div>
+        </CustomModal>
+      }
     </>
   )
 }
