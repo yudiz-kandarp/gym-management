@@ -11,6 +11,7 @@ export function setUrl(url = process.env.REACT_APP_BASE_URL, options = { prod: f
 const Axios = axios.create({
   // just set prod to true for using production server
   baseURL: setUrl('https://gym-management.webdevprojects.cloud/api', { prod: false, isDev: false }),
+  // baseURL: setUrl('http://192.168.13.39:8000/api', { prod: false, isDev: false }),
 })
 
 Axios.interceptors.request.use(

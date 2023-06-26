@@ -21,5 +21,11 @@ export function getSpecificInquiryVisit(id) {
 
 // inquiry FollowUp queries
 export function getInquiryFollowUpList(id) {
-  return Axios.get(`/v1/inquiryFollowup/list/all?${id}`)
+  console.log('id >> ', id)
+  return Axios.get(`/v1/inquiryFollowup/list/all?id=${id}`)
+}
+
+export function getSpecificInquiryFollowUp(id) {
+  console.log('specific FollowUp id >> ', id)
+  return Axios.get(`/v1/inquiryFollowup/${id}`)
 }
