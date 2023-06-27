@@ -21,6 +21,7 @@ import Button from 'Components/Button'
 import TablePagination from 'Components/Table-pagination'
 import Select from 'Components/Select'
 import { getOrganizationList } from 'Query/Organization/organization.query'
+import { getEmployeeList } from 'Query/Employee/employee.query'
 
 function AddInquiry () {
   const queryClient = useQueryClient()
@@ -33,7 +34,6 @@ function AddInquiry () {
   const [action, setAction] = useState('')
   const [deleteId, setDeleteId] = useState('')
   const [inquiryId, setInquiryId] = useState('')
-  const [organization, setOrganization] = useState([])
 
   const [inquiryVisitId, setInquiryVisitId] = useState(null)
   const [followUpId, setFollowUpId] = useState(null)
@@ -51,10 +51,13 @@ function AddInquiry () {
       search: parsedData?.search || '',
       sort: parsedData.sort || '',
       order: parsedData.order || '',
-      isBranch: parsedData.isBranch || true
+      isBranch: parsedData.isBranch || true,
+      eUserType: parsedData.eUserType || 'S'
     }
   }
   const [requestParams, setRequestParams] = useState(getParams())
+  const [requestVisitParams, setRequestVisitParams] = useState(getParams())
+  const [requestFollowUpParams, setRequestFollowUpParams] = useState(getParams())
 
   const { isAdd, isEdit, isViewOnly, id } = usePageType()
 
@@ -67,19 +70,6 @@ function AddInquiry () {
       queryClient.invalidateQueries('inquiry')
       toaster(res.data.message)
       navigate(route.inquiry)
-
-      reset({
-        sPurpose: res?.data?.sPurpose,
-        sDescription: res?.data?.sDescription,
-        sPreferredLocation: res?.data?.sPreferredLocation,
-        sName: res?.data?.sName,
-        sEmail: res?.data?.sEmail,
-        sPhone: res?.data?.sPhone,
-        sSecondaryPhone: res?.data?.sSecondaryPhone,
-        dFollowupDate: formatDate(res?.data.dFollowupDate, '-', true),
-        dInquiryAt: formatDate(res?.data.dInquiryAt, '-', true),
-        iBranchId: res?.data?.iBranchId?._id,
-      })
     },
   })
 
@@ -95,7 +85,6 @@ function AddInquiry () {
     enabled: isEdit || isViewOnly,
     select: (data) => data.data.inquiry,
     onSuccess: (data) => {
-      console.log('data >> ', data)
       // data.dInquiryAt = formatDate(data.dInquiryAt, '-', true)
       // data.dFollowupDate = formatDate(data.dFollowupDate, '-', true)
       reset({
@@ -112,28 +101,43 @@ function AddInquiry () {
       })
     },
   })
-  console.log({ specificInquiry, control })
 
-  const { data: organizationList } = useQuery(['organizationList', id], () => getOrganizationList(requestParams), {
+  const { data: organizationList } = useQuery('organizationList', () => getOrganizationList(), {
     enabled: isAdd || isEdit || isViewOnly,
     select: (data) => data.data.data.aOrganizationList,
     staleTime: 240000,
     onSuccess: (data) => {
       // const oVisit = data.find(item => item.dVisitedAt)
       // setVisitData(data)
-      setOrganization(data.map(({ _id, sName }) => ({ _id, sName })))
-      
+
     },
   })
-  console.log('organinzation data >> ', organization)
 
   const onSubmit = (data) => {
-    console.log({ id, data })
+    const addData = {
+      sPurpose: data?.sPurpose,
+      sDescription: data?.sDescription,
+      sPreferredLocation: data?.sPreferredLocation,
+      sName: data?.sName,
+      sEmail: data?.sEmail,
+      sPhone: data?.sPhone,
+      sSecondaryPhone: data?.sSecondaryPhone,
+      dFollowupDate: data?.dFollowupDate,
+      dInquiryAt: data?.dInquiryAt,
+      iBranchId: data?.iBranchId?._id
+    }
 
     if (isEdit) {
-      updateMutation.mutate({ id, data })
+      updateMutation.mutate({ id, addData })
     } else {
-      mutateAddInquiry(...data,)
+      mutateAddInquiry({
+        ...data,
+        iBranchId: data?.iBranchId?._id,
+        oBranch: {
+          _id: data?.iBranchId?._id,
+          sName: data?.iBranchId?.sName
+        }
+      })
     }
   }
 
@@ -151,9 +155,9 @@ function AddInquiry () {
     )
   )
 
-  const { data: visit } = useQuery(['inquiryVisit', id], () => getInquiryVisitList(id), {
+  const { data: visit } = useQuery(['inquiryVisit', id, requestVisitParams], () => getInquiryVisitList(id, requestVisitParams), {
     enabled: isEdit || isViewOnly,
-    select: (data) => data.data.data.aInquiryVisitList,
+    select: (data) => data.data.data,
     staleTime: 240000,
     onSuccess: (data) => {
       // const oVisit = data.find(item => item.dVisitedAt)
@@ -262,12 +266,11 @@ function AddInquiry () {
     )
   )
 
-  const { data: followUp } = useQuery(['inquiryFollowup', id], () => getInquiryFollowUpList(id), {
+  const { data: followUp } = useQuery(['inquiryFollowup', id, requestFollowUpParams], () => getInquiryFollowUpList(id, requestFollowUpParams), {
     enabled: isEdit || isViewOnly,
-    select: (data) => data.data.data.aInquiryFollowupList,
+    select: (data) => data.data.data,
     staleTime: 240000,
     onSuccess: (data) => {
-      console.log('data >> ', data)
       // data.dVistedAt = formatDate(data.dVistedAt, '-', true)
       // resetFollowUp(data)
       // setFollowupData(data.aInquiryFollowupList)
@@ -279,11 +282,31 @@ function AddInquiry () {
     select: (data) => data.data.inquiry,
     onSuccess: (data) => {
       console.log('data >> ', data)
-      data.dFollowupAt = formatDate(data.dFollowupAt, '-', true)
 
-      const filteredData = followUp?.find(item => item._id === id)
-      data.iFollowupBy = filteredData?.oFollowupBy?.sName,
-        resetFollowUp(data)
+      const FollowUpName = followUp?.aInquiryFollowupList?.find(item => item?.iFollowupBy)
+      const name = FollowUpName?.oFollowupBy
+
+      resetFollowUp({
+        dCreatedDate: data?.dCreatedDate,
+        dFollowupAt: formatDate(data.dFollowupAt, '-', true),
+        dUpdatedDate: data?.dUpdatedDate,
+        eStatus: data?.eStatus,
+        iCreatedBy: data?.iCreatedBy,
+        iFollowupBy: name,
+        iInquiryID: data?.iInquiryID,
+        sResponse: data?.sResponse,
+      })
+    },
+  })
+  console.log('followUpControl :>> ', followUpControl)
+
+  const { data: employeeList } = useQuery(['employeeList'], () => getEmployeeList(requestParams), {
+    enabled: action === 'add' || !!followUpId,
+    select: (data) => data.data.data.aEmployeeList,
+    staleTime: 240000,
+    onSuccess: (data) => {
+      // const oVisit = data.find(item => item.dVisitedAt)
+      // setVisitData(data)
     },
   })
 
@@ -291,6 +314,7 @@ function AddInquiry () {
     onSuccess: (res) => {
       queryClient.invalidateQueries('inquiryFollowup')
       toaster(res.data.message)
+      setModalFollowUp({ open: false })
       navigate(route.inquiryAddViewEdit('view', id))
     },
   })
@@ -317,12 +341,15 @@ function AddInquiry () {
     const addData = {
       sResponse: onSubmitData.sResponse,
       dFollowupAt: onSubmitData.dFollowupAt,
-      iFollowupBy: onSubmitData.iFollowupBy,
+      iFollowupBy: onSubmitData.iFollowupBy._id,
       iInquiryID: inquiryId
     }
 
     if (action === 'edit') {
-      mutateUpdateFollowUp({ followUpId, onSubmitData })
+      mutateUpdateFollowUp({
+        followUpId,
+        addData
+      })
     } else {
       mutateAddFollowUp({
         addData
@@ -341,8 +368,8 @@ function AddInquiry () {
     setAction('edit')
     setFollowUpId(id)
     setModalFollowUp({ open: true, id })
-
-    const filteredData = followUp?.find(item => item._id === id)
+    const filteredData = followUp?.addInquiryFollowUp?.find(item => item._id === id)
+    console.log('filteredData :>> ', filteredData)
     resetFollowUp({
       sResponse: specificFollowUp?.sResponse,
       dFollowupAt: formatDate(specificFollowUp?.dFollowupAt),
@@ -377,14 +404,25 @@ function AddInquiry () {
     },
   }
 
-  function changePage (page) {
-    setRequestParams({ ...requestParams, page, limit: requestParams?.limit || 10 })
-    appendParams({ ...requestParams, page: page / requestParams?.limit, limit: requestParams?.limit || 10 })
+  function changeVisitPage (page) {
+    setRequestVisitParams({ ...requestVisitParams, page, limit: requestVisitParams?.limit || 10 })
+    appendParams({ ...requestVisitParams, page: page / requestVisitParams?.limit, limit: requestVisitParams?.limit || 10 })
   }
 
-  function changePageSize (pageSize) {
-    setRequestParams({ ...requestParams, page: 0, limit: pageSize })
-    appendParams({ ...requestParams, page: 0, limit: pageSize })
+  function changeVisitPageSize (pageSize) {
+    setRequestVisitParams({ ...requestVisitParams, page: 0, limit: pageSize })
+    appendParams({ ...requestVisitParams, page: 0, limit: pageSize })
+    // setSelectedRows([{ changingPage: true }])
+  }
+
+  function changeFollowUpPage (page) {
+    setRequestFollowUpParams({ ...requestFollowUpParams, page, limit: requestFollowUpParams?.limit || 10 })
+    appendParams({ ...requestFollowUpParams, page: page / requestFollowUpParams?.limit, limit: requestFollowUpParams?.limit || 10 })
+  }
+
+  function changeFollowUpPageSize (pageSize) {
+    setRequestFollowUpParams({ ...requestFollowUpParams, page: 0, limit: pageSize })
+    appendParams({ ...requestFollowUpParams, page: 0, limit: pageSize })
     // setSelectedRows([{ changingPage: true }])
   }
 
@@ -400,6 +438,7 @@ function AddInquiry () {
             cancelButtonEvent={() => navigate(route.inquiry)}
           />
         </div>
+
         <Row className="mt-3">
           {isViewOnly ?
             <>
@@ -650,17 +689,21 @@ function AddInquiry () {
                   control={control}
                   rules={{ required: 'This field is required' }}
                   render={({ field: { onChange, value, ref }, fieldState: { error } }) => (
-                    <Select
-                      labelText="Branch"
-                      id="iBranchId"
-                      placeholder="Select Branch"
-                      onChange={onChange}
-                      value={value}
-                      ref={ref}
-                      isDisabled={isViewOnly}
-                      errorMessage={error?.message}
-                      options={organization?.map(item => item?.sName)}
-                    />
+                    <>
+                      <Select
+                        labelText="Branch"
+                        id="iBranchId"
+                        placeholder="Select Branch"
+                        onChange={onChange}
+                        value={value}
+                        getOptionLabel={(option) => option?.sName}
+                        getOptionValue={(option) => option?._id}
+                        ref={ref}
+                        isDisabled={isViewOnly}
+                        errorMessage={error?.message}
+                        options={organizationList}
+                      />
+                    </>
                   )}
                 />
               </Col>
@@ -731,6 +774,16 @@ function AddInquiry () {
 
       </Wrapper>
 
+      <Wrapper transparent>
+        <TablePagination
+          currentPage={Number(requestVisitParams?.page)}
+          totalCount={visit?.count || 0}
+          pageSize={requestVisitParams?.limit || 5}
+          onPageChange={(page) => changeVisitPage(page)}
+          onLimitChange={(limit) => changeVisitPageSize(limit)}
+        />
+      </Wrapper>
+
       <Wrapper>
         <div className="pageTitle-head">
           <PageTitle
@@ -743,14 +796,14 @@ function AddInquiry () {
         <DataTable
           columns={visitColumns}
           align="left"
-          totalData={visit?.length}
+          totalData={visit?.count}
           isLoading={isLoading || mutateAddVisit.isLoading}
         >
-          {visit?.map((item, i) => {
+          {visit?.aInquiryVisitList?.map((item, i) => {
             // if (id === item?.iInquiryID) {
             return (
               <tr key={i}>
-                <td>{cell(requestParams.page + (i + 1))}</td>
+                <td>{cell(requestVisitParams.page + (i + 1))}</td>
                 <td>{cell(item?.oCreator.sUserName)}</td>
                 <td>{cell(item?.sPurpose)}</td>
                 <td>{cell(item?.sDescription)}</td>
@@ -766,15 +819,15 @@ function AddInquiry () {
             // }
           })}
         </DataTable>
-      </Wrapper>
+      </Wrapper> 
 
       <Wrapper transparent>
         <TablePagination
-          currentPage={Number(requestParams?.page)}
-          totalCount={visit?.length || 0}
-          pageSize={requestParams?.limit || 5}
-          onPageChange={(page) => changePage(page)}
-          onLimitChange={(limit) => changePageSize(limit)}
+          currentPage={Number(requestFollowUpParams?.page)}
+          totalCount={followUp?.count || 0}
+          pageSize={requestFollowUpParams?.limit || 5}
+          onPageChange={(page) => changeFollowUpPage(page)}
+          onLimitChange={(limit) => changeFollowUpPageSize(limit)}
         />
       </Wrapper>
 
@@ -790,14 +843,14 @@ function AddInquiry () {
         <DataTable
           columns={followUpColumns}
           align="left"
-          totalData={followUp?.length}
+          totalData={followUp?.count}
           isLoading={isLoading || mutateAddFollowUp.isLoading}
         >
-          {followUp?.map((item, i) => {
+          {followUp?.aInquiryFollowupList?.map((item, i) => {
             if (id === item?.iInquiryID) {
               return (
                 <tr key={i}>
-                  <td>{cell(requestParams.page + (i + 1))}</td>
+                  <td>{cell(requestFollowUpParams.page + (i + 1))}</td>
                   <td>{cell(item?.oFollowupBy.sName)}</td>
                   <td>{cell(item?.sResponse)}</td>
                   <td>{cell(formatDate(item?.dFollowupAt))}</td>
@@ -812,16 +865,6 @@ function AddInquiry () {
             }
           })}
         </DataTable>
-      </Wrapper>
-
-      <Wrapper transparent>
-        <TablePagination
-          currentPage={Number(requestParams?.page)}
-          totalCount={followUp?.length || 0}
-          pageSize={requestParams?.limit || 5}
-          onPageChange={(page) => changePage(page)}
-          onLimitChange={(limit) => changePageSize(limit)}
-        />
       </Wrapper>
 
       {isViewOnly && modalVisit && (action !== 'delete') &&
@@ -963,16 +1006,23 @@ function AddInquiry () {
                     name="iFollowupBy"
                     control={followUpControl}
                     rules={{ required: 'This field is required' }}
-                    render={({ field, fieldState: { error } }) => (
-                      <Input
-                        {...field}
-                        labelText="FollowUp By"
-                        placeholder="Enter FollowUp By"
-                        id="iFollowupBy"
-                        errorMessage={error?.message}
-                        disabled={action === 'view'}
-                        type='text'
-                      />
+                    render={({ field: { onChange, value, ref }, fieldState: { error } }) => (
+                      <>
+                      {console.log({value})}
+                        <Select
+                          labelText="FollowUp By"
+                          id="iFollowupBy"
+                          placeholder="Select FollowUp By"
+                          onChange={onChange}
+                          value={value}
+                          getOptionLabel={(option) => option?.sName}
+                          getOptionValue={(option) => option?._id}
+                          ref={ref}
+                          isDisabled={action === 'view'}
+                          errorMessage={error?.message}
+                          options={employeeList}
+                        />
+                      </>
                     )}
                   />
                 </Col>

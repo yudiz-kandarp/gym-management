@@ -9,9 +9,9 @@ export function getSpecificInquiry(id) {
 }
 
 // inquiry Visit queries
-export function getInquiryVisitList(id) {
-  console.log('visit id >> ', id)
-  return Axios.get(`/v1/inquiryVisit/list/all?id=${id}`)
+export function getInquiryVisitList(id, query) {
+  console.log('visit id >> ', id, ', q', query)
+  return Axios.get(`/v1/inquiryVisit/list/all?${addQueryParams(query)}&id=${id}`)
 }
 
 export function getSpecificInquiryVisit(id) {
@@ -20,9 +20,9 @@ export function getSpecificInquiryVisit(id) {
 }
 
 // inquiry FollowUp queries
-export function getInquiryFollowUpList(id) {
+export function getInquiryFollowUpList(id, query) {
   console.log('id >> ', id)
-  return Axios.get(`/v1/inquiryFollowup/list/all?id=${id}`)
+  return Axios.get(`/v1/inquiryFollowup/list/all?${addQueryParams(query)}&id=${id}`)
 }
 
 export function getSpecificInquiryFollowUp(id) {
