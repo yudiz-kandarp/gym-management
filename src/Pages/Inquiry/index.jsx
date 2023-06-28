@@ -60,7 +60,6 @@ function InquiryList () {
       parsedData
     )
   )
-  console.log('data >> ', data)
 
   const navigate = useNavigate()
 
@@ -73,7 +72,6 @@ function InquiryList () {
   }
 
   function gotoDetail (id) {
-    console.log('id :>> ', id)
     navigate(route.inquiryAddViewEdit('view', id))
   }
 

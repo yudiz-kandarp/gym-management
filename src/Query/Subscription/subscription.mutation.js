@@ -9,5 +9,5 @@ export async function updateSubscription(data) {
 }
 
 export function deleteSubscription(id) {
-  return Axios.del(`/v1/subscription/delete/${id}`)
+  return Axios.delete(`/v1/subscription/delete/${id}`)
 }

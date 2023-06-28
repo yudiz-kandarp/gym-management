@@ -1,12 +1,10 @@
 import Axios from '../../axios'
 
 export async function addInquiry(data) {
-  console.log('data >> ', data)
   return Axios.put('/v1/inquiry/add', data)
 }
 
 export async function updateInquiry(data) {
-  console.log('edit data >> ', data)
   return Axios.patch(`/v1/inquiry/edit/${data?.id}`, data.addData)
 }
 
@@ -24,7 +22,6 @@ export async function updateInquiryVisit(data) {
 }
 
 export function deleteInquiryVisit(deleteId, inquiryId) {
-  console.log({deleteId, inquiryId})
   return Axios.delete(`/v1/inquiryVisit/delete?id=${deleteId}&inquiryId=${inquiryId}`)
 }
 
@@ -34,11 +31,9 @@ export async function addInquiryFollowUp(data) {
 }
 
 export async function updateInquiryFollowUp(data) {
-  console.log('edit data >> ', data)
   return Axios.patch(`/v1/inquiryFollowup/edit/${data?.followUpId}`, data.addData)
 }
 
 export function deleteInquiryFollowUp(deleteId) {
-  console.log({deleteId})
   return Axios.delete(`/v1/inquiryFollowup/delete/${deleteId}`)
 }

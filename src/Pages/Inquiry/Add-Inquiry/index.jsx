@@ -281,8 +281,6 @@ function AddInquiry () {
     enabled: !!followUpId,
     select: (data) => data.data.inquiry,
     onSuccess: (data) => {
-      console.log('data >> ', data)
-
       const FollowUpName = followUp?.aInquiryFollowupList?.find(item => item?.iFollowupBy)
       const name = FollowUpName?.oFollowupBy
 
@@ -298,8 +296,6 @@ function AddInquiry () {
       })
     },
   })
-  console.log('followUpControl :>> ', followUpControl)
-
   const { data: employeeList } = useQuery(['employeeList'], () => getEmployeeList(requestParams), {
     enabled: action === 'add' || !!followUpId,
     select: (data) => data.data.data.aEmployeeList,
@@ -369,7 +365,6 @@ function AddInquiry () {
     setFollowUpId(id)
     setModalFollowUp({ open: true, id })
     const filteredData = followUp?.addInquiryFollowUp?.find(item => item._id === id)
-    console.log('filteredData :>> ', filteredData)
     resetFollowUp({
       sResponse: specificFollowUp?.sResponse,
       dFollowupAt: formatDate(specificFollowUp?.dFollowupAt),
@@ -1008,7 +1003,6 @@ function AddInquiry () {
                     rules={{ required: 'This field is required' }}
                     render={({ field: { onChange, value, ref }, fieldState: { error } }) => (
                       <>
-                      {console.log({value})}
                         <Select
                           labelText="FollowUp By"
                           id="iFollowupBy"

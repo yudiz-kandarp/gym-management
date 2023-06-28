@@ -9,5 +9,5 @@ export async function updateTransaction(data) {
 }
 
 export function deleteTransaction(id) {
-  return Axios.del(`/v1/transaction/delete/${id}`)
+  return Axios.delete(`/v1/transaction/delete/${id}`)
 }
