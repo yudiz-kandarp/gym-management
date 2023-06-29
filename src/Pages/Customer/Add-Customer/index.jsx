@@ -17,6 +17,8 @@ import { addCustomer, updateCustomer } from 'Query/Customer/customer.mutation'
 import { getSpecificCustomer } from 'Query/Customer/customer.query'
 import CalendarInput from 'Components/Calendar-Input'
 import { getOrganizationList } from 'Query/Organization/organization.query'
+import Button from 'Components/Button'
+import Divider from 'Components/Divider'
 
 function AddCustomer () {
   const navigate = useNavigate()
@@ -90,6 +92,10 @@ function AddCustomer () {
 
     },
   })
+
+  function handleLifeCycle () {
+    navigate(route.lifeCycleHistory('view' , id , 'life-cycle'))
+  }
 
   return (
     <Wrapper isLoading={isLoading || mutation.isLoading || updateMutation.isLoading}>
@@ -298,6 +304,15 @@ function AddCustomer () {
               </>
             )}
           />
+        </Col>
+      </Row>
+
+      <Row className='mt-2'>
+        <Col lg={12} md={12} xs={12}>
+          <p className='mb-0'>View Life Cycle History:</p>
+          <Divider className='mb-2' width={'155%'} height="1px" />
+
+          <Button onClick={handleLifeCycle}>LifeCycle History</Button>
         </Col>
       </Row>
     </Wrapper>

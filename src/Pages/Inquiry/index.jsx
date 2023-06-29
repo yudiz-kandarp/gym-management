@@ -140,16 +140,6 @@ function InquiryList () {
 
   return (
     <>
-      <Wrapper transparent>
-        <TablePagination
-          currentPage={Number(requestParams?.page)}
-          totalCount={data?.count || 0}
-          pageSize={requestParams?.limit || 5}
-          onPageChange={(page) => changePage(page)}
-          onLimitChange={(limit) => changePageSize(limit)}
-        />
-      </Wrapper>
-      
       <Wrapper>
         <PageTitle
           title="Inquiry"
@@ -196,6 +186,16 @@ function InquiryList () {
             )
           })}
         </DataTable>
+      </Wrapper>
+
+      <Wrapper transparent>
+        <TablePagination
+          currentPage={Number(requestParams?.page)}
+          totalCount={data?.count || 0}
+          pageSize={requestParams?.limit || 5}
+          onPageChange={(page) => changePage(page)}
+          onLimitChange={(limit) => changePageSize(limit)}
+        />
       </Wrapper>
 
       <CustomModal modalBodyClassName="p-0 py-2" open={modal.open} handleClose={() => setModal({ open: false })} title="Are you Sure?">
