@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
@@ -6,7 +7,7 @@ import { Row, Col } from 'react-bootstrap'
 import Input from 'Components/Input'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
-import { toaster } from 'helpers'
+import { formatDate, toaster } from 'helpers'
 import './_addCustomer.scss'
 import { route } from 'Routes/route'
 import DescriptionInput from 'Components/DescriptionInput'
@@ -14,11 +15,15 @@ import Select from 'Components/Select'
 import usePageType from 'Hooks/usePageType'
 import { addCustomer, updateCustomer } from 'Query/Customer/customer.mutation'
 import { getSpecificCustomer } from 'Query/Customer/customer.query'
+import CalendarInput from 'Components/Calendar-Input'
+import { getOrganizationList } from 'Query/Organization/organization.query'
+import Button from 'Components/Button'
+import Divider from 'Components/Divider'
 
-function AddCustomer() {
+function AddCustomer () {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const { isEdit, isViewOnly, id } = usePageType()
+  const { isAdd, isEdit, isViewOnly, id } = usePageType()
   const Gender = [
     { label: 'Male', value: 'M' },
     { label: 'Female', value: 'F' },
@@ -26,9 +31,9 @@ function AddCustomer() {
   ]
 
   const mutation = useMutation((data) => addCustomer(data), {
-    onSuccess: (res) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries('customers')
-      toaster(res.data.message)
+      toaster(data.data.message)
       navigate(route.customers)
     },
   })
@@ -43,11 +48,25 @@ function AddCustomer() {
   const { control, reset, handleSubmit } = useForm()
 
   const onSubmit = (data) => {
-    data.eGender = data.eGender.value
+
+    const addData = {
+      ...data,
+      eGender: data.eGender.value,
+      iBranchId: data.iBranchId._id
+    }
+
     if (isEdit) {
-      updateMutation.mutate({ id, data })
+      updateMutation.mutate({ id, addData })
     } else {
-      mutation.mutate(data)
+      mutation.mutate({
+        ...data,
+        eGender: data.eGender.value,
+        iBranchId: data?.iBranchId?._id,
+        oBranch: {
+          _id: data?.iBranchId?._id,
+          sName: data?.iBranchId?.sName
+        }
+      })
     }
   }
 
@@ -56,9 +75,27 @@ function AddCustomer() {
     select: (data) => data?.data?.customer,
     onSuccess: (data) => {
       data.eGender = Gender?.find((g) => g.value === data?.eGender)
+      data.dBirthDate = formatDate(data.dBirthDate, '-', true)
+      data.dAnniversaryDate = formatDate(data.dAnniversaryDate, '-', true)
+      data.iBranchId
       reset(data)
     },
   })
+
+  const { data: organizationList } = useQuery('organizationList', () => getOrganizationList(), {
+    enabled: isAdd || isEdit || isViewOnly,
+    select: (data) => data.data.data.aOrganizationList,
+    staleTime: 240000,
+    onSuccess: (data) => {
+      // const oVisit = data.find(item => item.dVisitedAt)
+      // setVisitData(data)
+
+    },
+  })
+
+  function handleLifeCycle () {
+    navigate(route.lifeCycleHistory('view' , id , 'life-cycle'))
+  }
 
   return (
     <Wrapper isLoading={isLoading || mutation.isLoading || updateMutation.isLoading}>
@@ -165,6 +202,33 @@ function AddCustomer() {
         </Col>
         <Col lg={6} md={6} xs={12}>
           <Controller
+            name="iBranchId"
+            control={control}
+            rules={{ required: 'This field is required' }}
+            render={({ field: { onChange, value, ref }, fieldState: { error } }) => (
+              <>
+                <Select
+                  labelText="Branch"
+                  id="iBranchId"
+                  placeholder="Select Branch"
+                  onChange={onChange}
+                  value={value}
+                  getOptionLabel={(option) => option?.sName}
+                  getOptionValue={(option) => option?._id}
+                  ref={ref}
+                  isDisabled={isViewOnly}
+                  errorMessage={error?.message}
+                  options={organizationList}
+                />
+              </>
+            )}
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col lg={12} md={12} xs={12}>
+          <Controller
             name="sAddress"
             control={control}
             rules={{ required: 'This field is required' }}
@@ -181,6 +245,74 @@ function AddCustomer() {
               </>
             )}
           />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col lg={6} md={6} xs={12}>
+          <Controller
+            name="dBirthDate"
+            control={control}
+            rules={{ required: 'Date of Birth is required' }}
+            render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
+              <CalendarInput
+                disabled={isViewOnly}
+                onChange={onChange}
+                value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
+                ref={ref}
+                errorMessage={error?.message}
+                title="Date Of Birth"
+              />
+            )}
+          />
+        </Col>
+        <Col lg={6} md={6} xs={12}>
+          <Controller
+            name="dAnniversaryDate"
+            control={control}
+            rules={{ required: 'Anniversary Date is required' }}
+            render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
+              <CalendarInput
+                disabled={isViewOnly}
+                onChange={onChange}
+                value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
+                ref={ref}
+                errorMessage={error?.message}
+                title="Anniversary Date"
+              />
+            )}
+          />
+        </Col>
+      </Row>
+
+      <Row>
+        <Col lg={12} md={12} xs={12}>
+          <Controller
+            name="sFitnessGoal"
+            control={control}
+            rules={{ required: 'This field is required' }}
+            render={({ field, fieldState: { error } }) => (
+              <>
+                <DescriptionInput
+                  className="p-2 text-dark"
+                  label="Fitness Goal"
+                  errorMessage={error?.message}
+                  disabled={isViewOnly}
+                  placeholder="Enter your Fitness Goal"
+                  {...field}
+                />
+              </>
+            )}
+          />
+        </Col>
+      </Row>
+
+      <Row className='mt-2'>
+        <Col lg={12} md={12} xs={12}>
+          <p className='mb-0'>View Life Cycle History:</p>
+          <Divider className='mb-2' width={'155%'} height="1px" />
+
+          <Button onClick={handleLifeCycle}>LifeCycle History</Button>
         </Col>
       </Row>
     </Wrapper>

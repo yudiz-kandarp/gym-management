@@ -33,6 +33,7 @@ function TrainerList() {
       search: parsedData?.search || '',
       sort: parsedData.sort || '',
       order: parsedData.order || '',
+      eUserType: 'T'  
     }
   }
   const [requestParams, setRequestParams] = useState(getParams())
@@ -41,7 +42,6 @@ function TrainerList() {
     select: (data) => data.data.data,
     staleTime: 240000,
   })
-
   const mutation = useMutation(deleteTrainer, {
     onSuccess: (res) => {
       queryClient.invalidateQueries('trainer')
@@ -159,18 +159,18 @@ function TrainerList() {
         <DataTable
           columns={columns}
           align="left"
-          totalData={data?.trainers?.length}
+          totalData={data?.aEmployeeList?.length}
           isLoading={isLoading || mutation.isLoading || isFetching}
           handleSorting={handleSorting}
           disableActions={!isGranted(permissions.ALL)}
         >
-          {data?.trainers?.map((item, i) => {
+          {data?.aEmployeeList?.map((item, i) => {
             return (
               <tr key={i}>
                 <td>{cell(requestParams.page + (i + 1))}</td>
                 <td>{cell(item?.sName)}</td>
                 <td>{cell(item?.nExpertLevel)}</td>
-                <td>{cell(item?.sExperince)}</td>
+                <td>{cell(item?.sExperience)}</td>
                 <td>{cell(item?.eType)}</td>
                 <ActionColumn
                   permissions={permissions}

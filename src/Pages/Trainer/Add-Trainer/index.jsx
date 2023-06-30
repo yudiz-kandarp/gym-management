@@ -7,7 +7,7 @@ import Input from 'Components/Input'
 import Wrapper from 'Components/wrapper'
 import PageTitle from 'Components/Page-Title'
 import Rating from 'Components/Rating'
-import { toaster } from 'helpers'
+import { formatDate, toaster } from 'helpers'
 import { route } from 'Routes/route'
 import DescriptionInput from 'Components/DescriptionInput'
 import Select from 'Components/Select'
@@ -15,8 +15,9 @@ import usePageType from 'Hooks/usePageType'
 import { getSpecificTrainer } from 'Query/Trainer/trainer.query'
 import './_addTrainer.scss'
 import { addTrainer, updateTrainer } from 'Query/Trainer/trainer.mutation'
+import CalendarInput from 'Components/Calendar-Input'
 
-function AddTrainer() {
+function AddTrainer () {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { isEdit, isViewOnly, id } = usePageType()
@@ -29,6 +30,11 @@ function AddTrainer() {
     { label: 'Personal', value: 'Personal' },
     { label: 'Public', value: 'Public' },
   ]
+
+  // const eUserType = [
+  //   { label: 'Trainer', value: 'T' },
+  //   { label: 'Staff', value: 'S' },
+  // ]
 
   const mutation = useMutation((data) => addTrainer(data), {
     onSuccess: (res) => {
@@ -53,16 +59,18 @@ function AddTrainer() {
     if (isEdit) {
       updateMutation.mutate({ id, data })
     } else {
-      mutation.mutate(data)
+      mutation.mutate({ ...data, eUserType: 'T' })
     }
   }
 
   const { isLoading } = useQuery(['trainersDetails', id], () => getSpecificTrainer(id), {
     enabled: isEdit || isViewOnly,
-    select: (data) => data?.data?.trainer,
+    select: (data) => data.data.employee,
     onSuccess: (data) => {
       data.eGender = Gender?.find((g) => g.value === data?.eGender)
       data.eType = Type?.find((g) => g.value === data?.eType)
+      data.dBirthDate = formatDate(data.dBirthDate, '-', true)
+      data.dAnniversaryDate = formatDate(data.dAnniversaryDate, '-', true)
       reset(data)
     },
   })
@@ -225,7 +233,7 @@ function AddTrainer() {
         </Col>
         <Col lg={6} md={6} xs={12} className="mt-md-0 mt-3">
           <Controller
-            name="sExperince"
+            name="sExperience"
             control={control}
             rules={{ required: 'This field is required' }}
             render={({ field, fieldState: { error } }) => (
@@ -234,8 +242,64 @@ function AddTrainer() {
                 labelText="Experience"
                 disabled={isViewOnly}
                 placeholder="Enter Experience "
-                id="sExperince"
+                id="sExperience"
                 errorMessage={error?.message}
+              />
+            )}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col lg={12} md={12} xs={12} className="mt-md-0 mt-3">
+          <Controller
+            name="nCharges"
+            control={control}
+            rules={{ required: 'This field is required' }}
+            render={({ field, fieldState: { error } }) => (
+              <Input
+                {...field}
+                labelText="Charges"
+                type="number"
+                disabled={isViewOnly}
+                placeholder="Enter Charges"
+                id="nCharges"
+                errorMessage={error?.message}
+              />
+            )}
+          />
+        </Col>
+      </Row>
+      <Row>
+        <Col lg={6} md={6} xs={12} className="mt-md-0 mt-3">
+        <Controller
+            name="dBirthDate"
+            control={control}
+            rules={{ required: 'Date of Birth is required' }}
+            render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
+              <CalendarInput
+                disabled={isViewOnly}
+                onChange={onChange}
+                value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
+                ref={ref}
+                errorMessage={error?.message}
+                title="Date Of Birth"
+              />
+            )}
+          />
+        </Col>
+        <Col lg={6} md={6} xs={12} className="mt-md-0 mt-3">
+        <Controller
+            name="dAnniversaryDate"
+            control={control}
+            rules={{ required: 'Date of Anniversary is required' }}
+            render={({ field: { ref, onChange, value }, fieldState: { error } }) => (
+              <CalendarInput
+                disabled={isViewOnly}
+                onChange={onChange}
+                value={value || (isViewOnly && new Date().toISOString().substring(0, 16))}
+                ref={ref}
+                errorMessage={error?.message}
+                title="Date of Anniversary"
               />
             )}
           />

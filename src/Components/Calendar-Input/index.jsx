@@ -9,7 +9,7 @@ import Cancel from 'Assets/Icons/Cancel'
 function CalendarInput({ value, onChange, timeAndDate, defaultValue, disabled, ...props }, ref) {
   return (
     <Form.Group className="input">
-      {props.title && <Form.Label>{props.title}</Form.Label>}
+      {props.title && <Form.Label className='m-0'>{props.title}</Form.Label>}
       <div
         className={`calendar-input ${value ? '' : detectBrowser() === 'Safari' ? 'showPlaceholder' : ''} ${
           props.errorMessage ? 'errorInput' : ''

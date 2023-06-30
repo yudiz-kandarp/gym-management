@@ -28,10 +28,16 @@ function AddTransaction() {
   })
   const { isEdit, isViewOnly, id } = usePageType()
 
+  // const ePaymentTag = [
+  //   { label: 'Partially', value: 'Partially' },
+  //   { label: 'Full', value: 'Full' },
+  //   { label: 'Pending', value: 'Pending' },
+  // ]
+
+
   const ePaymentTag = [
-    { label: 'Partially', value: 'Partially' },
-    { label: 'Full', value: 'Full' },
-    { label: 'Pending', value: 'Pending' },
+    { label: 'Partially', value: 'P' },
+    { label: 'Full', value: 'F' }
   ]
 
   const mutation = useMutation((data) => addTransaction(data), {
@@ -55,6 +61,7 @@ function AddTransaction() {
     data.iSubscriptionId = data.iSubscriptionId?._id
     data.iTrainerId = data.iTrainerId?._id
     data.ePaymentTag = data.ePaymentTag.value
+    data.nPrice = parseInt(data.nPrice)
     delete data.iCustomerId
     if (isEdit) {
       updateMutation.mutate({ id, data })
@@ -80,11 +87,11 @@ function AddTransaction() {
     handleSearch: handleSearch,
   } = useInfiniteScroll(['customers', isViewOnly], () => getSubscriptionList(subscriptionParams), {
     enabled: !isViewOnly,
-    select: (data) => data.data.data.subscribedUsers,
+    select: (data) => data.data.data.aSubscriptionList,
     requestParams: subscriptionParams,
     updater: setSubscriptionParams,
   })
-
+  
   return (
     <Wrapper isLoading={isLoading || mutation.isLoading || updateMutation.isLoading}>
       <PageTitle
@@ -143,6 +150,7 @@ function AddTransaction() {
             )}
           />
         </Col>
+
         <Col lg={6} md={6} xs={12}>
           <Controller
             name="nPrice"
@@ -157,7 +165,7 @@ function AddTransaction() {
                 onChange={onChange}
                 value={value}
                 ref={ref}
-                isDisabled={isViewOnly}
+                disabled={isViewOnly}
                 errorMessage={error?.message}
                 options={ePaymentTag}
               />
