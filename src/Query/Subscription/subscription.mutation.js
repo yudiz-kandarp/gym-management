@@ -1,11 +1,11 @@
 import Axios from '../../axios'
 
 export async function addSubscription(data) {
-  return Axios.post('/v1/subscription/add', data)
+  return Axios.put('/v1/subscription/add', data)
 }
 
 export async function updateSubscription(data) {
-  return Axios.put(`/v1/subscription/edit/${data?.id}`, data.data)
+  return Axios.patch(`/v1/subscription/edit/${data?.id}`, data.data)
 }
 
 export function deleteSubscription(id) {

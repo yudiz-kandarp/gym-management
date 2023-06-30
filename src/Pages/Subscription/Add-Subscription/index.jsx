@@ -16,9 +16,10 @@ import { addSubscription } from 'Query/Subscription/subscription.mutation'
 import { updateSubscription } from 'Query/Subscription/subscription.mutation'
 import useInfiniteScroll from 'Hooks/useInfiniteScroll'
 import { getCustomerList } from 'Query/Customer/customer.query'
-import { getTrainerList } from 'Query/Trainer/trainer.query'
+import Input from 'Components/Input'
+import { getOrganizationList } from 'Query/Organization/organization.query'
 
-function AddSubscription() {
+function AddSubscription () {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const [customerParams, setCustomerParams] = useState({
@@ -33,10 +34,14 @@ function AddSubscription() {
   })
   const { isEdit, isViewOnly, id } = usePageType()
 
+  // const ePaymentTag = [
+  //   { label: 'Partially', value: 'Partially' },
+  //   { label: 'Full', value: 'Full' },
+  //   { label: 'Pending', value: 'Pending' },
+  // ]
   const ePaymentTag = [
-    { label: 'Partially', value: 'Partially' },
-    { label: 'Full', value: 'Full' },
-    { label: 'Pending', value: 'Pending' },
+    { label: 'Partially', value: 'P' },
+    { label: 'Full', value: 'F' }
   ]
 
   const mutation = useMutation((data) => addSubscription(data), {
@@ -58,8 +63,8 @@ function AddSubscription() {
 
   const onSubmit = (data) => {
     data.iCustomerId = data.iCustomerId?._id
-    data.iTrainerId = data.iTrainerId?._id
     data.ePaymentTag = data.ePaymentTag.value
+    data.iBranchId = data.iBranchId._id
     if (isEdit) {
       updateMutation.mutate({ id, data })
     } else {
@@ -84,7 +89,8 @@ function AddSubscription() {
     handleSearch: handleSearch,
   } = useInfiniteScroll(['customers', isViewOnly], () => getCustomerList(customerParams), {
     enabled: !isViewOnly,
-    select: (data) => data.data.data.customers,
+    // select: (data) => data.data.data.customers,
+    select: (data) => data.data.data.aCustomerList,
     requestParams: customerParams,
     updater: setCustomerParams,
   })
@@ -92,9 +98,10 @@ function AddSubscription() {
     data: TrainerList = [],
     handleScroll: handleScrollTrainer,
     handleSearch: handleSearchTrainer,
-  } = useInfiniteScroll(['trainers', isViewOnly], () => getTrainerList(trainerParams), {
+  } = useInfiniteScroll(['trainers', isViewOnly], () => getOrganizationList(trainerParams), {
     enabled: !isViewOnly,
-    select: (data) => data.data.data.trainers,
+    // select: (data) => data.data.data.trainers,
+    select: (data) => data.data.data.aOrganizationList,
     requestParams: trainerParams,
     updater: setTrainerParams,
   })
@@ -135,13 +142,13 @@ function AddSubscription() {
         </Col>
         <Col lg={6} md={6} xs={12} className="mt-3 mt-md-0">
           <Controller
-            name="iTrainerId"
+            name="iBranchId"
             control={control}
             rules={{ required: 'This field is required' }}
             render={({ field: { onChange, value, ref }, fieldState: { error } }) => (
               <Select
                 labelText="Trainer"
-                id="iTrainerId"
+                id="iBranchId"
                 placeholder="Select Trainer"
                 onChange={onChange}
                 getOptionLabel={(option) => option.sName}
@@ -216,11 +223,45 @@ function AddSubscription() {
             )}
           />
         </Col>
-        <Col lg={6} md={6} xs={12} className="mt-3 mt-md-0"></Col>
+        <Col lg={6} md={6} xs={12} className="mt-3 mt-md-0">
+          <Controller
+            name="nPrice"
+            control={control}
+            rules={{ required: 'This field is required' }}
+            render={({ field, fieldState: { error } }) => (
+              <Input
+                {...field}
+                labelText="Price"
+                type="number"
+                disabled={isViewOnly}
+                placeholder="Enter the Price"
+                id="nPrice"
+                errorMessage={error?.message}
+              />
+            )}
+          />
+        </Col>
       </Row>
 
-      <Row className="mt-2 mt-lg-2 pt-lg-2">
-        <Col lg={6} md={6} xs={12}></Col>
+      <Row className="pt-lg-2">
+        <Col lg={6} md={6} xs={12}>
+          <Controller
+            name="nPaymentCycle"
+            control={control}
+            rules={{ required: 'This field is required' }}
+            render={({ field, fieldState: { error } }) => (
+              <Input
+                {...field}
+                labelText="Payment Cycle"
+                type="number"
+                disabled={isViewOnly}
+                placeholder="Enter the Payment Cycle"
+                id="nPaymentCycle"
+                errorMessage={error?.message}
+              />
+            )}
+          />
+        </Col>
         <Col lg={6} md={6} xs={12}></Col>
       </Row>
     </Wrapper>
